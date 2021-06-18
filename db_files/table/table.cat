@@ -1,0 +1,12 @@
+employee name 0 3
+name           CHAR   10   1 
+age            INT    4    0 
+salary         FLOAT  4    0 
+1
+idx_name       name           
+
+students id 0 1
+ID             CHAR   10   1 
+1
+idx_id         ID             
+
