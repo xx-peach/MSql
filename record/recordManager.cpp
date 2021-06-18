@@ -4,8 +4,8 @@
  * @prototype: RecordManager(IndexManager& _index_manager, BufferManager& _buffer_manager);
  * @function: the only needed constructor
  **/
-RecordManager::RecordManager(/*IndexManager& _index_manager, */BufferManager& _buffer_manager, CatalogManager& _catalog_manager):
-                             /*index_manager(_index_manager), */buffer_manager(_buffer_manager), catalog_manager(_catalog_manager) {}
+RecordManager::RecordManager(IndexManager& _index_manager, BufferManager& _buffer_manager, CatalogManager& _catalog_manager):
+                             index_manager(_index_manager), buffer_manager(_buffer_manager), catalog_manager(_catalog_manager) {}
 
 /**
  * @prototype: insertTuple(Table& table, Tuple& tuple);
@@ -119,8 +119,8 @@ Result RecordManager::selectTuple(const Table& table, vector<SelectCondition>& s
                 continue;
             if ( !(table.attributeVector[selectConditions[i].attributeIndex].isUnique) )
                 continue;
-            /*if ( !index_manager.isIndexExist(table.tableName, table.attributeVector[i].attributeName, table.attributeVector[i].type) )
-                continue;*/
+            if ( !catalog_manager.is_index_exist(table.tableName, table.attributeVector[i].attributeName) )
+                continue;
             tmp = i; // A condition's attribute with index found
             break;
         }
@@ -198,7 +198,7 @@ int RecordManager::deleteTuple(Table& table, vector<SelectCondition>& selectCond
         // Delete tuple from file
         //
         /*for ( int j = 0; j < attrIndex.size(); j++ )
-		    index_manager.deleteIndex(table.tableName, table.attributeVector[attrIndex[j]].attributeName, table.attributeVector[attrIndex[j]].type, tuple.getData()[attrIndex[j]].elementToString()); // parameters to be modified by IndexManger developer*/
+		    index_manager.deleteIndex(table.tableName, table.attributeVector[attrIndex[j]].attributeName, table.attributeVector[attrIndex[j]].type, tuple.getData()[attrIndex[j]].elementToString());*/
     }
     table.rowNum -= deleteNum;
     return deleteNum;
@@ -210,34 +210,11 @@ int RecordManager::deleteTuple(Table& table, vector<SelectCondition>& selectCond
  **/
 vector<int> RecordManager::selectWithIndex(const Table& table, SelectCondition& condition) {
     condition.fillAttributeIndex(table.tableName, catalog_manager);
-    vector<int> idx; idx.clear();
-    if ( condition.conditionType == EQUAL ) {
-        /*index_manager.findElement(table.tableName, table.attributeVector[condition.attributeIndex].attributeName, table.attributeVector[condition.attributeIndex].type, condition.value.elementToString(), idx); // parameters to be modified by IndexManger developer*/
-            if(idx[0] == -1)    // not found equal
-                idx.clear();
-    }
-    else if ( condition.conditionType == NOT_EQUAL ) {
-        int flag = -1;
-        /*if(index_manager.findElement(table.tableName, table.attributeVector[condition.attributeIndex].attributeName, table.attributeVector[condition.attributeIndex].type, condition.value.elementToString(), idx) == SUCCESS) // parameters to be modified by IndexManger developer
-            flag = idx[0];*/
-        idx.clear();
-        for(int i = 0; i < table.rowNum; i++)
-            idx.push_back(i);
-        if(flag != -1)          // found equal and remove it from search result
-            idx.erase(find(idx.begin(), idx.end(), flag));
-    }
-    /*else if ( condition.conditionType == GREATER ) {
-        index_manager.greater_than(table.tableName, table.attributeVector[condition.attributeIndex].attributeName, table.attributeVector[condition.attributeIndex].type, condition.value.elementToString(), idx, 0);
-    }
-    else if ( condition.conditionType == GREATER_EQUAL ) {
-        index_manager.greater_than(table.tableName, table.attributeVector[condition.attributeIndex].attributeName, table.attributeVector[condition.attributeIndex].type, condition.value.elementToString(), idx, 1);
-    }
-    else if ( condition.conditionType == LESS ) {
-        index_manager.less_than(table.tableName, table.attributeVector[condition.attributeIndex].attributeName, table.attributeVector[condition.attributeIndex].type, condition.value.elementToString(), idx, 0);
-    }
-    else if ( condition.conditionType == LESS_EQUAL ) {
-        index_manager.less_than(table.tableName, table.attributeVector[condition.attributeIndex].attributeName, table.attributeVector[condition.attributeIndex].type, condition.value.elementToString(), idx, 1);
-    }*/
+    vector<int> idx;
+    idx.clear();
+    char* con_value = (char*)malloc(condition.value.length * sizeof(char));
+    condition.value.elementToChar(con_value);
+    index_manager.compare(table.tableName, table.attributeVector[condition.attributeIndex].attributeName, table.attributeVector[condition.attributeIndex].type, con_value, idx, condition.conditionType);
     return idx;
 }
 
@@ -324,22 +301,23 @@ bool RecordManager::isMatchTheAttribute(const Table& table, Tuple& tuple) {
 }
 
 bool RecordManager::isConflictTheUnique(const Table& table, Tuple& tuple) {
+    char* value = (char*)malloc(table.rowLength * sizeof(char));
     int attrNum = table.attributeNum;
     for(int i = 0; i < attrNum; i++){
         if(!table.attributeVector[i].isUnique)
             continue;
-        /*if(catalog_manager.is_index_exist(table.tableName, table.attributeVector[i].attributeName)) { // Use index to find directly
+        if(catalog_manager.is_index_exist(table.tableName, table.attributeVector[i].attributeName)) { // Use index to find directly
             vector<int> idx;
             idx.clear();
-            if(index_manager.findElement(table.tableName, table.attributeVector[i].attributeName, table.attributeVector[i].type, tuple.getData()[i].elementToString(), idx) == SUCCESS) // parameters to be modified by IndexManger developer
+            if(index_manager.find_element(table.tableName, table.attributeVector[i].attributeName, table.attributeVector[i].type, value, idx) == SUCCESS)
                 return true;
-        } else { // Iteration without index*/
+        } else { // Iteration without index
             for(int j = 0; j < table.rowNum; j++){
                 Tuple tmpTuple = getTupleByRowNumber(table, j);
                 if (tmpTuple.getData()[i] == tuple.getData()[i])
                     return true;
             }
-        //}
+        }
     }
     return false;
 }
