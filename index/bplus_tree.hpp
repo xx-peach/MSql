@@ -124,10 +124,7 @@ void BPlusTree<T>::WriteNodeBackToBuffer(std::shared_ptr<Node<T>>& node){
     //reverse process of node constructor function
     for(int j=0; j < node->element_num; j++){
         if (typeid(T)==typeid(char*)){//string
-            char* temp = new char[size_of_type];//cannot add 1, for regularization
-            memset(temp,0,size_of_type);//initialization
-            memcpy(temp,node->element[j],strlen(node->element[j]));//char* data
-            memcpy(block_head + i,temp,size_of_type);//copy into block
+            memcpy(block_head + i,node->element[j],size_of_type);//copy into block
             i += size_of_type;
             delete[] temp;
         }else{//float or int
