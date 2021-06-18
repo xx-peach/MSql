@@ -32,25 +32,25 @@ add_subdirectory(ui)
 # links the object file to the library file
 target_link_libraries(
     MSql PUBLIC
-    api
-    buffer
-    # catalog
-    # index
     interpreter
     record
+    buffer
+    index
+    api
     ui
+    # catalog
     # utils
 )
 
 # include the subdirectories
 target_include_directories(
     MSql PUBLIC
-    api
-    buffer
-    # catalog
-    # index
     interpreter
     record
+    buffer
+    index
+    api
     ui
+    # catalog
     # utils
 )
