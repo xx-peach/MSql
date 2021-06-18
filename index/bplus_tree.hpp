@@ -13,9 +13,9 @@ public:
     block_t first_leaf_index;   //for transfer
     int order;                  //order of all the nodes
     int size_of_type;           //size of data type
-    string db_name;             //tree information
-    string table_name;
-    string file_name;
+    string table_name;          //attribute name
+    // string db_name;             
+    // string file_name;
 
 private:
     //Search value from the root by binary search, return the leaf node res_node with the value's index in node
@@ -52,11 +52,11 @@ private:
     
 public:
     //ctor
-    BPlusTree(string db_name, string table_name, string file_name, int order, int size_of_type, block_t root_index,block_t first_leaf_index);
+    BPlusTree(string table_name, int order, int size_of_type, block_t root_index = -1,block_t first_leaf_index = -1);//last 2 defalut non
     ~BPlusTree();
 
     //find value in b+ tree, return the offset of value in the result node. return false if failed
-    bool Search(T value);
+    int Search(T value);
 
     //insert value into tree, return false if failed
     bool InsertElement(T value, int offset);
@@ -79,16 +79,16 @@ public:
 
 //construct function of B+ Tree
 template <class T>
-BPlusTree<T>::BPlusTree(string db_name, string table_name, string file_name, int order, int size_of_type, block_t root_index,block_t first_leaf_index){
-    this->db_name = db_name;
+BPlusTree<T>::BPlusTree( string table_name, int order, int size_of_type, block_t root_index,block_t first_leaf_index){
+    // this->db_name = db_name;
     this->table_name = table_name;
-    this->file_name = file_name;
+    // this->file_name = file_name;
     this->order = order;
     this->size_of_type = size_of_type;
     this->root_index = root_index;
     this->first_leaf_index = first_leaf_index;
     if(this->root_index==-1){//not such node
-        biter temp = buffer_manager.getFileBlock(file_name,1,size_of_type,1);//get an new block from the file,record amont = 1,len is arbitrary
+        biter temp = buffer_manager.getFileBlock(table_name,1,size_of_type,1);//get an new block from the file,record amont = 1,len is arbitrary
         this->root_index = (*temp)->block_index;
         this->first_leaf_index = this->root_index;//from new block
         std::shared_ptr<Node<T>> root_node = std::make_shared<Node<T>>(order,this->root_index,true);//use node consrtuction/true:is_leaf
@@ -143,7 +143,7 @@ void BPlusTree<T>::WriteNodeBackToBuffer(std::shared_ptr<Node<T>>& node){
             i += sizeof(block_t);
         }
     }
-    (*temp)->writecover(block_head);
+    (*temp)->writecover(block_head,i);
     // (*temp)->data = block_head;//change the data in block(write back)
     // (*temp)->use_times ++;//use time ++ 
     // (*temp)->block_dirty_bit = 1;//use the block
@@ -154,12 +154,12 @@ void BPlusTree<T>::WriteNodeBackToBuffer(std::shared_ptr<Node<T>>& node){
 template<class T>
 char* BPlusTree<T>::GetBlockData(block_t index){
     biter block_temp = GetBlockOffset(index);//find the block in the file
-    return ((*block_temp)->data).c_str();
+    return ((*block_temp)->data);
 }
 
 //search function
 template <class T>
-bool BPlusTree<T>::Search(T value){
+int BPlusTree<T>::Search(T value){
     std::shared_ptr<Node<T>> res_node;//store result node information
     int res_index = -1;//result index
     //reconstruct the root node for search
@@ -563,8 +563,9 @@ template <class T>
 void BPlusTree<T>::SetEmptyBackToBuffer(std::shared_ptr<Node<T>> &node){
     node->element_num = 0;
     biter temp = GetBlockOffset(node->block_index);
-    (*temp)->data = nullptr;
-    (*temp)->byte_offset = 0;
-    (*temp)->block_dirty_bit = 1;
+    buffer_manager.setEmptyBlock(temp);
+    // (*temp)->data[0] = 0;
+    // (*temp)->byte_offset = 0;
+    // (*temp)->block_dirty_bit = 1;
 }
 #endif

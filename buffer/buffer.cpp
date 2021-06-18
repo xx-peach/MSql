@@ -344,6 +344,15 @@ void BufferManager::writeBack( biter block ) {
         else cout << "BufferManager::writeBack error, " << (*block)->block_file->file_name << " not find";
     }
 }
+/**
+ * @function: set block empty
+ * @return: void
+ **/
+void BufferManager::setEmptyBlock(biter block){
+    memset((*block)->data, '\0', block_size);
+    (*block)->byte_offset = 0;
+    (*block)->block_dirty_bit = 1;
+}
 
 /**
  * @prototype: closeFile( fiter file );

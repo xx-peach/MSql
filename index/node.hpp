@@ -23,6 +23,7 @@ public:
     vector<T> element;              //list of elements
     vector<block_t> childs_index;   //indexs of child blocks, -1 for null
     vector<int> offset;             //offset for record
+
 public:
     //ctor
     Node(int order, block_t block_index, bool is_leaf );                   //create new node

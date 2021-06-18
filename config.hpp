@@ -77,6 +77,7 @@ enum Result {
     NO_SUCH_ELEMENT=-84,			//when search failed
     INSERT_FAIL=-85,				//when insert failed
     DELETE_FAIL=-86,				//when delete failed
+    ERROR_CMP_VALUE=-87,            //input error cmp value
 
     // Catalog
     TABLE_NAME_EXSITED = -101,                  // When creating a new table

@@ -33,13 +33,13 @@ typedef blocklist::iterator biter;
 class Block {
 private:
     bool locked;                    // false->unlocked, true->locked
-    block_t block_index;            // the index of the block in the blockList of a specific file
     block_t block_dirty_bit;        // 0->false, 1->true, it is a dirty block which needs to be write back
     block_t use_times;              // the use times of the block
     FileTable* block_file;          // the file that this block belongs to
 public:
     char* data;                     // the char array to store the data
     block_t byte_offset;            // the total number of byte in the block
+    block_t block_index;            // the index of the block in the blockList of a specific file
 
     friend class FileTable;         // friend class FileTable
     friend class BufferManager;     // firend class BufferManager
@@ -152,6 +152,12 @@ public:
      * @return: void
      **/
     void writeBack( Block block );
+
+    /**
+     * @function: set block empty
+     * @return: void
+     **/
+    void setEmptyBlock(biter block);
 
     /**
      * @function: close a file, destroy all the blocks in that file(write back at the same time)
