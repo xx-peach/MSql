@@ -1,1 +1,0 @@
-/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/MSql.dir/main.cpp.o  -o MSql  api/libapi.a buffer/libbuffer.a interpreter/libinterpreter.a record/librecord.a ui/libui.a interpreter/generated/libgenerated.a interpreter/generated/antlr4_cpp_runtime/runtime/libantlr4_cpp_runtime.a 
