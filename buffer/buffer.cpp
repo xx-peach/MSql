@@ -228,7 +228,6 @@ biter BufferManager::getBlock( const fiter file ) {
     // if there are still free blocks in the block pool
     biter bit;
     if ( used_block < block_numb ) {
-        // cout << "getBlock here" << endl;
         block_pool[used_block].block_index = (*file)->blockList.size(); // index start from 0
         block_pool[used_block].block_file = *file;
         (*file)->blockList.push_back( &block_pool[used_block] );
@@ -244,7 +243,7 @@ biter BufferManager::getBlock( const fiter file ) {
             // if the block is unlocked, then replace it
             if ( !block_pool[idx].locked ) {
                 // remove the block from its original file
-                // writeBack( (biter)&block_pool[idx] );
+                writeBack( block_pool[idx] );
                 removeBlock( file, block_pool[idx].block_index );
                 // initialize the block
                 block_pool[idx].block_index = (*file)->blockList.size();
@@ -294,6 +293,34 @@ biter BufferManager::getFileBlock( string name, file_t type, file_t len, file_t 
 }
 
 /**
+ * @prototype: writeBack( Block block );
+ * @function: write back the block's data into disk
+ * @return: void
+ **/
+void BufferManager::writeBack( Block block ) {
+    if ( !block.block_dirty_bit ) return;
+    else {
+        // get the file path
+        string file_path;
+        if ( !block.block_file->file_type ) file_path = TABLE_DIR + block.block_file->file_name + TABLE_SUF;
+        else file_path = INDEX_DIR + block.block_file->file_name + INDEX_SUF;
+        ofstream outFile( file_path, ios::binary | ios::out );
+        // write the modified block into the disk
+        if ( outFile.is_open() ) {
+            // get the file size
+            outFile.seekp( 0, ios::end );
+            streampos file_size = outFile.tellp();
+            // find the position to write in
+            int offset = block_size * block.block_index;
+            outFile.seekp( offset, ios::beg );
+            outFile.write( block.data, block.byte_offset );
+            outFile.close();
+        }
+        else cout << "BufferManager::writeBack error, " << block.block_file->file_name << " not find";
+    }
+}
+
+/**
  * @prototype: writeBack( biter block );
  * @function: write back the block's data into disk
  * @return: void
@@ -301,7 +328,6 @@ biter BufferManager::getFileBlock( string name, file_t type, file_t len, file_t 
 void BufferManager::writeBack( biter block ) {
     if ( !(*block)->block_dirty_bit ) return;
     else {
-        cout << "here" << endl;
         // get the file path
         string file_path;
         if ( !(*block)->block_file->file_type ) file_path = TABLE_DIR + (*block)->block_file->file_name + TABLE_SUF;
@@ -315,7 +341,6 @@ void BufferManager::writeBack( biter block ) {
             // find the position to write in
             int offset = block_size * (*block)->block_index;
             outFile.seekp( offset, ios::beg );
-            cout << (*block)->data << endl;
             outFile.write( (*block)->data, (*block)->byte_offset );
             outFile.close();
         }

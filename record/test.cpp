@@ -15,10 +15,10 @@ int main()
     Table table = catalog_manager.get_table(tableName);
 
     vector<pair<NumType, string>> SuZhonggen;
-    SuZhonggen.push_back(make_pair(CHAR, "SuZhonggen"));
-    SuZhonggen.push_back(make_pair(INT, "55"));
-    SuZhonggen.push_back(make_pair(FLOAT, "5500000"));
-    if(record_manager.insertTuple(table, SuZhonggen))
+    SuZhonggen.push_back(make_pair(CHAR, "Su"));
+    SuZhonggen.push_back(make_pair(INT, "65"));
+    SuZhonggen.push_back(make_pair(FLOAT, "12613.1"));
+    if ( record_manager.insertTuple(table, SuZhonggen) )
         cout << "Failed to insert SuZhonggen!" << endl;
 
     cout << table.rowNum << endl;

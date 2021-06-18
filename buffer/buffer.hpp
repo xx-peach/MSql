@@ -148,6 +148,12 @@ public:
     void writeBack( biter block );
 
     /**
+     * @function: write back the block's data into disk
+     * @return: void
+     **/
+    void writeBack( Block block );
+
+    /**
      * @function: close a file, destroy all the blocks in that file(write back at the same time)
      * @return: void
      **/

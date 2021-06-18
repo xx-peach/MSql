@@ -12,7 +12,10 @@
 #include <fstream>
 #include <iomanip>
 #include <algorithm>
+#include <string>
 #include <map>
+
+using namespace std;
 
 /* Including:
 	- Definition of tables, including name, number of attributes, primary key, index
@@ -190,6 +193,14 @@ private:
 	}
 	
 public:
+	CatalogManager() {
+		initialCatalog();
+	}
+
+	// ~CatalogManager() {
+	// 	storeCatalog();
+	// }
+
 	string getTableNameByIndexName(string indexName) {
 		return indexes[indexName].tableName;
 	}
@@ -401,8 +412,35 @@ public:
 			return "";
 	}
 
+	FieldType get_attribute_field_type(string tableName, int i) {
+		return tables[tableName].attributeVector.at(i).type;
+	}
+
 	string get_attribute_name(string tableName, int i) {
 		return tables[tableName].attributeVector.at(i).attributeName;
+	}
+
+	vector<string> get_titles(string tableName) {
+		vector<string> titles;
+		for ( int i = 0; i < tables[tableName].attributeVector.size(); i++ ) {
+			string temp = get_attribute_name(tableName, i);
+			FieldType f = get_attribute_field_type(tableName, i);
+			switch (f.get_type()) {
+				case INT:
+					temp += "(int)";
+					break;
+				case FLOAT:
+					temp += "(float)";
+					break;
+				case CHAR:
+					temp += "(char(" + to_string(f.get_length()) + "))";
+					break;
+				default:
+					break;
+			}
+			titles.push_back(temp);
+		}
+		return titles;
 	}
 
 	int get_attribute_index(string tableName, string attributeName) {

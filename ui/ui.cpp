@@ -31,62 +31,49 @@ string UI::fetchStatement() const {
 	return statement;
 }
 
-void UI::plotTable(const vector<string>& src_name_list, const vector<NumType>& src_type_list, const vector<int>& src_length_list, const vector<Tuple>& src_tuple_list, const vector<string>& src_attr_names) const{
-	switch (src_tuple_list.size()) {
+void UI::plotTable(const vector<Tuple>& tuples, const vector<string>& titles) const {
+	// print the prompt of how many tuples selected
+	switch (tuples.size()) {
 		case 0:
-			cout << "Empty set" << endl;
+			cout << "0 record selected" << endl;
+			return;
+		case 1:
+			cout << "1 record selected" << endl;
 			break;
 		default:
-			cout << src_tuple_list.size() << " records selected" << endl;
+			cout << tuples.size() << " records selected" << endl;
 			break;
 	}
-	vector<string> titles;
-	vector<string> new_titles;
-	for ( int i = 0; i < src_name_list.size(); i++ ) {
-		string temp = src_name_list[i];
-		switch (src_type_list[i]) {
-			case NumType::INT:
-				temp += "(int)";
-				break;
-			case NumType::FLOAT:
-				temp += "(float)";
-				break;
-			case NumType::CHAR:
-				temp += "(char(" + to_string(src_length_list[i]) + "))";
-				break;
-			default:
-				break;
+	// push the title into the printList
+	vector<vector<string>> printList;
+	printList.push_back(titles);
+	// push all the data into the printList
+	for ( auto t : tuples ) {
+		vector<string> tempTuple;
+		for ( int i = 0; i < t.getData().size(); i++ ) {
+			tempTuple.push_back(t.getData()[i].elementToString());
 		}
-		new_titles.push_back(temp);
+		printList.push_back(tempTuple);
 	}
-	vector<vector<string>> to_print_table;
-	to_print_table.push_back(new_titles);
-	for (auto i : src_tuple_list) {
-		vector<string> temp;
-		auto item_list = i.valueList(src_attr_names);
-		for (auto j : item_list) {
-			temp.push_back(j.toString());
-		}
-		to_print_table.push_back(temp);
-	}
-	vector<int> max_lengths(src_attr_names.size(), 0);
-	for (auto i : to_print_table) {
-		for (auto j = i.begin(); j != i.end(); j++) {
-			max_lengths[j - i.begin()] = max(max_lengths[j - i.begin()], int(j->length()));
+	// find the max row length of each column
+	vector<int> maxLens(titles.size(), 0);
+	for ( auto i : printList ) {
+		for ( auto j = i.begin(); j != i.end(); ++j ) {
+			maxLens[j-i.begin()] = max(maxLens[j-i.begin()], int(j->length()));
 		}
 	}
 	vector<vector<string>> new_print;
-	for (auto i : to_print_table) {
+	for ( auto i : printList ) {
 		vector<string> new_tuple;
-		for (auto j = i.begin(); j != i.end(); j++) {
-			*j = "|" + *j + string(max_lengths[j - i.begin()] - j->length() + 1, ' ');
+		for ( auto j = i.begin(); j != i.end(); j++ ) {
+			*j = "|" + *j + string(maxLens[j - i.begin()] - j->length() + 1, ' ');
 			new_tuple.push_back(*j);
 		}
 		new_print.push_back(new_tuple);
 	}
-	for (auto i : new_print) {
-		for (int j = 0; j < max_lengths.size(); j++) {
-			cout << "+" << string(max_lengths[j]+1, '-');
+	for ( auto i : new_print ) {
+		for (int j = 0; j < maxLens.size(); j++) {
+			cout << "+" << string(maxLens[j]+1, '-');
 		}
 		cout << "+" << endl;;
 		for (auto j : i) {
@@ -94,8 +81,8 @@ void UI::plotTable(const vector<string>& src_name_list, const vector<NumType>& s
 		}
 		cout << "|" << endl;;
 	}
-	for (int j = 0; j < max_lengths.size(); j++) {
-		cout << "+" << string(max_lengths[j]+1, '-');
+	for ( int j = 0; j < maxLens.size(); j++ ) {
+		cout << "+" << string(maxLens[j]+1, '-');
 	}
 	cout << "+" << endl;;
 }

@@ -26,7 +26,6 @@ Result RecordManager::insertTuple(Table& table, Tuple& tuple) {
         return ERROR;
     }
     tupleToChar(tuple, tmpData);
-    cout << strlen(tmpData) << endl;
     bool writeResult = writeToBuffer(table.tableName, table.rowNum, tmpData, table.rowLength);
     free(tmpData);
     if ( writeResult == false ) {
@@ -42,7 +41,7 @@ Result RecordManager::insertTuple(Table& table, Tuple& tuple) {
  * @function: insert a tuple into the table, can call the insertTuple above
  **/
 Result RecordManager::insertTuple(Table& table, vector<pair<NumType, string>>& tupleString) {
-    if (tupleString.size() != table.attributeNum) {
+    if ( tupleString.size() != table.attributeNum ) {
         cout << "RecordManager::insertTuple error, tuple attributes do not match the table" << endl;
         return ATTR_NUM_NOT_MATCH;
     }
@@ -283,10 +282,7 @@ bool RecordManager::readFromBuffer(string tableName, int rowNum, char* data, int
         return false;
     int offset = rowNum % (block_size / rowLength);
     biter block = buffer_manager.getBlockbyOffset(file, idx);
-    strcpy(data, (*block)->data);
-    memmove(data, &data[rowLength*offset], rowLength);
-    // strcpy(data, (*block)->data);
-    // memcpy(data, &data[rowLength*offset], rowLength);
+    memmove(data, (*block)->data, rowLength);
     return true;
 }
 
@@ -300,6 +296,7 @@ void RecordManager::printTable(const Table& table) {
         cout << "RecordManager::printTable error, memory used up" << endl;
         return;
     }
+    // cout << table.rowNum << endl;
     for(int i = 0; i < table.rowNum; i++) {
         Tuple tuple = getTupleByRowNumber(table, i);
         for (int j = 0; j < tuple.getData().size(); j++) {
@@ -349,7 +346,7 @@ bool RecordManager::isConflictTheUnique(const Table& table, Tuple& tuple) {
 
 Tuple RecordManager::getTupleByRowNumber(const Table& table, int rowNumber) {
     Tuple tuple;
-    char* tmpData = (char*)malloc(table.rowLength * sizeof(char));
+    char* tmpData = (char*)malloc(table.rowLength*sizeof(char));
     if (tmpData == NULL) {
         cout << "RecordManager::getTupleByRowNumber error, memory used up" << endl;
         return tuple;
@@ -362,62 +359,68 @@ Tuple RecordManager::getTupleByRowNumber(const Table& table, int rowNumber) {
 
 bool RecordManager::judgeCondition(string tableName, Tuple& tuple, SelectCondition& condition) {
     condition.fillAttributeIndex(tableName, catalog_manager);
-    if (condition.conditionType == LESS) {
-        if (tuple.getData()[condition.attributeIndex] < condition.value)
+    if ( condition.conditionType == LESS ) {
+        if ( tuple.getData()[condition.attributeIndex] < condition.value) 
             return true;
     } else if (condition.conditionType == LESS_EQUAL) {
-        if (tuple.getData()[condition.attributeIndex] <= condition.value)
+        if ( tuple.getData()[condition.attributeIndex] <= condition.value )
             return true;
-    } else if (condition.conditionType == EQUAL) {
-        if (tuple.getData()[condition.attributeIndex] == condition.value)
+    } else if ( condition.conditionType == EQUAL ) {
+        if ( tuple.getData()[condition.attributeIndex] == condition.value )
             return true;
-    } else if (condition.conditionType == GREATER_EQUAL) {
-        if (tuple.getData()[condition.attributeIndex] >= condition.value)
+    } else if ( condition.conditionType == GREATER_EQUAL ) {
+        if ( tuple.getData()[condition.attributeIndex] >= condition.value )
             return true;
-    } else if (condition.conditionType == GREATER) {
-        if (tuple.getData()[condition.attributeIndex] > condition.value)
+    } else if ( condition.conditionType == GREATER ) {
+        if ( tuple.getData()[condition.attributeIndex] > condition.value )
             return true;
-    } else if (condition.conditionType == NOT_EQUAL) {
-        if (tuple.getData()[condition.attributeIndex] != condition.value)
+    } else if (condition.conditionType == NOT_EQUAL ) {
+        if ( tuple.getData()[condition.attributeIndex] != condition.value )
             return true;
     }
     return false;
 }
 
 Tuple RecordManager::charToTuple(const Table& table, char* c) {
-    char* original = c;
     Tuple tuple;
+    char* original = c;
+    // get the first row index
     int* tmp = (int*)malloc(sizeof(int));
     memmove(tmp, c, sizeof(int));
     tuple.setIndex(*tmp);
     free(tmp);
+    // get all the attributes of the tuple
     c += sizeof(int);
     int n = table.attributeNum;
-    for(int i = 0; i < n; i++) {
+    for ( int i = 0; i < n; i++ ) {
         Element tmpElement;
-        tmpElement.setType(table.attributeVector[i].type.get_type());
-        tmpElement.setLength(table.attributeVector[i].type.get_length());
-        tmpElement.charToElement(c);
+        tmpElement.setType(table.attributeVector[i].type.get_type());       // set element type
+        tmpElement.setLength(table.attributeVector[i].type.get_length());   // set element length
+        tmpElement.charToElement(c);                                        // set element true data
         tuple.push_back_Data(tmpElement);
-        c += table.attributeVector[i].type.get_length();
-        if(table.attributeVector[i].type.get_type() == CHAR)
-            c++;
+        c += table.attributeVector[i].type.get_length();                    // update pointer position
     }
+    // recover to original pointer
     c = original;
+    // return tuple
     return tuple;
 }
 
 void RecordManager::tupleToChar(Tuple& tuple, char* c) {
     char* original = c;
+    // store the tuple index first
     int index = tuple.getIndex();
     memmove(c, &index, sizeof(int));
+    // store all the attributes of the tuple
     c += sizeof(int);
     int n = tuple.getData().size();
-    for(int i = 0; i < n; i++) {
-        tuple.getData()[i].elementToChar(c);
-        c += tuple.getData()[i].length;
-        if(tuple.getData()[i].type == CHAR)
-            c++;
+    for ( int i = 0; i < n; i++ ) {
+        tuple.getData()[i].elementToChar(c);    // transfer the element data to char
+        c += tuple.getData()[i].length;         // update pointer position
     }
+    // recover to original pointer
     c = original;
 }
+
+// if(table.attributeVector[i].type.get_type() == CHAR)
+//     c++;
