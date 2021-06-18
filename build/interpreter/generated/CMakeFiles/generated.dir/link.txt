@@ -1,0 +1,2 @@
+D:\mingw-w64\x86_64-8.1.0-win32-seh-rt_v6-rev0\mingw64\bin\ar.exe qc libgenerated.a CMakeFiles/generated.dir/MSqlParserBaseListener.cpp.obj CMakeFiles/generated.dir/MSqlParserBaseVisitor.cpp.obj CMakeFiles/generated.dir/MSqlParserListener.cpp.obj CMakeFiles/generated.dir/MSqlParserVisitor.cpp.obj CMakeFiles/generated.dir/MSqlParser.cpp.obj CMakeFiles/generated.dir/MSqlLexer.cpp.obj
+D:\mingw-w64\x86_64-8.1.0-win32-seh-rt_v6-rev0\mingw64\bin\ranlib.exe libgenerated.a

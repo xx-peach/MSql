@@ -118,11 +118,11 @@ Node<T>::Node(int order, block_t block_index, char* block_head, int size_of_type
     }    
 
     for(int j=0; j < this->element_num; j++){//order of childs
-        if (std::is_same<T,std::string>::value){//string
+        if (std::is_same<T,std::char*>::value){//string
             char* temp = new char[size_of_type+1];
             memcpy(temp,block_head+i,size_of_type);//string data
             temp[size_of_type] = '\0';//ensure to be string
-            this->element[j] = string(temp);
+            this->element[j] = temp;
             i += size_of_type;
             delete[] temp;
         }else{//float or int

@@ -15,7 +15,7 @@ public:
     int size_of_type;           //size of data type
     string table_name;          //attribute name
     // string db_name;             
-    // string file_name;
+    // string table_name;
 
 private:
     //Search value from the root by binary search, return the leaf node res_node with the value's index in node
@@ -82,7 +82,7 @@ template <class T>
 BPlusTree<T>::BPlusTree( string table_name, int order, int size_of_type, block_t root_index,block_t first_leaf_index){
     // this->db_name = db_name;
     this->table_name = table_name;
-    // this->file_name = file_name;
+    // this->table_name = table_name;
     this->order = order;
     this->size_of_type = size_of_type;
     this->root_index = root_index;
@@ -123,10 +123,10 @@ void BPlusTree<T>::WriteNodeBackToBuffer(std::shared_ptr<Node<T>>& node){
     }
     //reverse process of node constructor function
     for(int j=0; j < node->element_num; j++){
-        if (std::is_same<T,std::string>::value){//string
+        if (std::is_same<T,std::char*>::value){//string
             char* temp = new char[size_of_type];//cannot add 1, for regularization
             memset(temp,0,size_of_type);//initialization
-            memcpy(temp,node->element[j].c_str(),node->element[j].size());//string data
+            memcpy(temp,node->element[j],strlen(node->element[j]));//char* data
             memcpy(block_head + i,temp,size_of_type);//copy into block
             i += size_of_type;
             delete[] temp;
@@ -135,7 +135,7 @@ void BPlusTree<T>::WriteNodeBackToBuffer(std::shared_ptr<Node<T>>& node){
             i += sizeof(T);
         }
 
-        if(this->is_leaf){//data|offset|data|offset|...
+        if(node->is_leaf){//data|offset|data|offset|...
             *((int*)(block_head + i)) = node->offset[j];  //store offset
             i += sizeof(int);
         }else{//not leaf://data|child|data|child|...
@@ -218,7 +218,7 @@ bool BPlusTree<T>::InsertElement(T value, int offset){
 //get the biter easily
 template <class T>
 biter BPlusTree<T>::GetBlockOffset(block_t index){
-    fiter file_temp = buffer_manager.getFile(this->file_name, 1, size_of_type, 1);//get the file
+    fiter file_temp = buffer_manager.getFile(this->table_name, 1, size_of_type, 1);//get the file
     biter block_temp = buffer_manager.getBlockbyOffset(file_temp, index);//find the blockin the file
     return block_temp;
 }
@@ -228,7 +228,7 @@ biter BPlusTree<T>::GetBlockOffset(block_t index){
 //splite node execution
 template<class T>
 void BPlusTree<T>::SpliteExe(std::shared_ptr<Node<T>>& node){
-    biter new_node_iter = buffer_manager.getFileBlock(this->file_name,1,size_of_type,1);
+    biter new_node_iter = buffer_manager.getFileBlock(this->table_name,1,size_of_type,1);
     block_t new_node_index = (*new_node_iter)->block_index;
     std::shared_ptr<Node<T>> new_node = std::make_shared<Node<T>>(this->order,new_node_index,node->is_leaf);//new node
     T min_value;
@@ -251,7 +251,7 @@ void BPlusTree<T>::SpliteExe(std::shared_ptr<Node<T>>& node){
         //original node's childs need not change, because the parent not change
     }
     if(node->parent_index == -1){// root node, need to create new root node
-        biter new_root_iter = buffer_manager.getFileBlock(this->file_name, 1, size_of_type, 1);
+        biter new_root_iter = buffer_manager.getFileBlock(this->table_name, 1, size_of_type, 1);
         block_t new_root_index = (*new_root_iter)->block_index;
         std::shared_ptr<Node<T>> new_root_node = std::make_shared<Node<T>>(order, new_root_index, false);
         //change root
@@ -260,8 +260,8 @@ void BPlusTree<T>::SpliteExe(std::shared_ptr<Node<T>>& node){
         new_node->parent_index = new_root_index;
         new_root_node->element[0] = min_value;//min value in the sub tree
         new_root_node->element_num = 1;
-        new_root_node->childs_index[0] = node;
-        new_root_node->childs_index[1] = new_node;
+        new_root_node->childs_index[0] = node->block_index;
+        new_root_node->childs_index[1] = new_node->block_index;
         WriteNodeBackToBuffer(node);//update orginal node to buffer
         WriteNodeBackToBuffer(new_node);//update new node to buffer
         WriteNodeBackToBuffer(new_root_node);//update new root node to buffer
