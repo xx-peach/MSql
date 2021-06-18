@@ -9,6 +9,7 @@
 #include <vector>
 #include <queue>
 #include <memory>
+#include <typeinfo>
 using namespace std;
 
 template <class T>
@@ -67,7 +68,7 @@ public:
     }
 
     //for error information
-    void AlreadyExist(int value){
+    void AlreadyExist(T value){
         this->OutputNode();
         cout<< endl << "[ERROR]Element " << value <<" is already in this node." << endl;
     }
@@ -118,7 +119,7 @@ Node<T>::Node(int order, block_t block_index, char* block_head, int size_of_type
     }    
 
     for(int j=0; j < this->element_num; j++){//order of childs
-        if (std::is_same<T,std::char*>::value){//string
+        if (typeid(T)==typeid(char*)){//char*
             char* temp = new char[size_of_type+1];
             memcpy(temp,block_head+i,size_of_type);//string data
             temp[size_of_type] = '\0';//ensure to be string
@@ -170,7 +171,7 @@ void Node<T>::Splite(T &value, std::shared_ptr<Node<T>> &NewNode){
             NewNode->offset[i - element_num/2] = this->offset[i];
         }
         NewNode->next_leaf_index = this->next_leaf_index;
-        this->next_leaf_index = NewNode->block_id;
+        this->next_leaf_index = NewNode->block_index;
         NewNode->parent_index = this->parent_index;
         NewNode->element_num=this->element_num - (this->element_num/2);
         this->element_num = this->element_num/2;

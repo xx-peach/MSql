@@ -20,13 +20,13 @@ class IndexManager{
         Result drop_index(const string &table_name, const string &attribute_name, FieldType type);
 
         // find element
-        Result find_element(const string &table_name, const string &attribute_name, FieldType type, const char* value, std::vector<block_t> &block_index);
+        Result find_element(const string &table_name, const string &attribute_name, FieldType type, char* value, std::vector<block_t> &block_index);
 
         //insert index
         // Result insert_index(const std::string &table_name, const string &attribute_name, FieldType type, const std::string &data, int block_index);
 
         //cmp result
-        Result compare(const string &table_name, const string &attribute_name, FieldType type, const char* value, std::vector<block_t> &block_index, CMP cmp);
+        Result compare(const string &table_name, const string &attribute_name, FieldType type, char* value, std::vector<block_t> &block_index, CMP cmp);
         
         //is the index on this type exist
         bool is_index_exist(string file_name, FieldType type);
@@ -36,7 +36,7 @@ class IndexManager{
         //some map of index
         map<string, shared_ptr<BPlusTree<int>>> int_index;//one string map a ptr to b+ tree
         map<string, shared_ptr<BPlusTree<float>>>float_index;
-        map<string, shared_ptr<BPlusTree<string>>> string_index;
+        map<string, shared_ptr<BPlusTree<char*>>> string_index;
         map<string, int> string_index_len;
         map<string, block_t> int_index_start_block;
         map<string, block_t> float_index_start_block;
@@ -58,8 +58,8 @@ class IndexManager{
             return block_iter;
         }
         //functions used by cmp function
-        Result greater_than(const string &table_name, const string &attribute_name, FieldType type, const char* value, bool is_equal, std::vector<block_t> &block_index);
-        Result less_than(const string &table_name, const string &attribute_name, FieldType type, const char* value, bool is_equal, std::vector<block_t> &block_index);
+        Result greater_than(const string &table_name, const string &attribute_name, FieldType type, char* value, bool is_equal, std::vector<block_t> &block_index);
+        Result less_than(const string &table_name, const string &attribute_name, FieldType type, char* value, bool is_equal, std::vector<block_t> &block_index);
 };
 
 
@@ -126,7 +126,7 @@ Result IndexManager::create_index(const string &table_name, const string &attrib
         int order = get_order(type);
         switch(type.get_type()){
             case CHAR:{
-                string_index[map_index] = make_shared<BPlusTree<string>>(table_name, order, type.get_length());//index node
+                string_index[map_index] = make_shared<BPlusTree<char*>>(table_name, order, type.get_length());//index node
                 string_index_start_block[map_index] = block_index;//start block(root)
                 string_index_len[map_index] = type.get_length();//string length
                 break;
@@ -191,7 +191,7 @@ Result IndexManager::drop_index(const string &table_name, const string &attribut
     }
 }
 
-Result IndexManager::find_element(const string &table_name, const string &attribute_name, FieldType type, const char* value, std::vector<block_t> &block_index){
+Result IndexManager::find_element(const string &table_name, const string &attribute_name, FieldType type, char* value, std::vector<block_t> &block_index){
     fiter file = index_getFile(table_name);
     string map_index = table_name+"/"+attribute_name;
     Result flag = SUCCESS;
@@ -223,7 +223,7 @@ Result IndexManager::find_element(const string &table_name, const string &attrib
     return flag;
 }
 
-Result IndexManager::greater_than(const string &table_name, const string &attribute_name, FieldType type, const char* value, bool is_equal, std::vector<block_t> &block_index){
+Result IndexManager::greater_than(const string &table_name, const string &attribute_name, FieldType type, char* value, bool is_equal, std::vector<block_t> &block_index){
     fiter file = index_getFile(table_name);
     string map_index = table_name+"/"+attribute_name;
     Result flag = SUCCESS;
@@ -246,7 +246,7 @@ Result IndexManager::greater_than(const string &table_name, const string &attrib
     return flag;
 }
 
-Result IndexManager::less_than(const string &table_name, const string &attribute_name, FieldType type, const char* value, bool is_equal, std::vector<block_t> &block_index){
+Result IndexManager::less_than(const string &table_name, const string &attribute_name, FieldType type, char* value, bool is_equal, std::vector<block_t> &block_index){
     fiter file = index_getFile(table_name);
     string map_index = table_name+"/"+attribute_name;
     Result flag = SUCCESS;
@@ -278,7 +278,7 @@ Result IndexManager::less_than(const string &table_name, const string &attribute
 	LESS,
 	LESS_EQUAL,
     ERROR_CMP*/
-Result IndexManager::compare(const string &table_name, const string &attribute_name, FieldType type, const char* value, std::vector<block_t> &block_index, CMP cmp){
+Result IndexManager::compare(const string &table_name, const string &attribute_name, FieldType type, char* value, std::vector<block_t> &block_index, CMP cmp){
     Result flag1 = SUCCESS, flag2 = SUCCESS;
     switch(cmp){
         case EQUAL:{
