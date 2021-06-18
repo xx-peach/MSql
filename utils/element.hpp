@@ -74,10 +74,7 @@ public:
     
     /* set the length of the current element */
     void setLength(const int l) {
-        if ( type == CHAR)
-            length = l;
-        else
-            length = l;
+        length = l;
     }
 
     /* write the element to a char array */

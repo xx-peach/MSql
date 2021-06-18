@@ -290,8 +290,8 @@ void Interpreter::interpret(const string& s) {
                 return;
             }
             else {
-                vector<Element> elements;
-                for ( i = i+1; i < tokenList[i].size(); i++ ) {
+                ++i; vector<Element> elements;
+                for ( ; i < tokenList.size(); i++ ) {
                     Element tmpElement = getElement(tokenList[i]);
                     elements.push_back(tmpElement);
                 }

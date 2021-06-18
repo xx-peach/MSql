@@ -68,11 +68,9 @@ void Block::read() {
     ifstream inFile( file_path, ios::in | ios::binary );
     if ( inFile.is_open() ) {
         // read in data from file
-        // char temp[block_size+1] = {};                       // declare a empty char array to receive the data
         inFile.seekg( block_size * block_index, ios::beg ); // locate file position by offset
         inFile.read( data, block_size );                    // read in the data, at most block_size bytes
         // update block header information
-        // data = temp;
         byte_offset += inFile.gcount();
         use_times += 1;
         // close the file
@@ -92,11 +90,10 @@ bool Block::write( const char* d, int l ) {
         return false;
     }
     else {
-        byte_offset += l;       // change the offset of the block
-        block_dirty_bit = 1;    // assert the dirty bit which denotes modification on this block
-        use_times += 1;         // increment the use_time variable
-        memcpy(data, d, l);
-        // data += d;              // append the new record to the block
+        memcpy(data+byte_offset, d, l);     // append the new record to the block
+        byte_offset += l;                   // change the offset of the block
+        block_dirty_bit = 1;                // assert the dirty bit which denotes modification on this block
+        use_times += 1;                     // increment the use_time variable
         return true;
     }
 }
