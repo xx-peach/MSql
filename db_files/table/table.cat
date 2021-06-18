@@ -5,8 +5,12 @@ salary         FLOAT  4    0
 1
 idx_name       name           
 
-students id 0 1
-ID             CHAR   10   1 
-1
-idx_id         ID             
+test id 0 3
+id             INT    4    1 
+name           CHAR   30   1 
+salary         FLOAT  4    0 
+2
+test_id        id             
+
+t_name         name           
 

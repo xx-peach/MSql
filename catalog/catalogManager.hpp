@@ -197,9 +197,9 @@ public:
 		initialCatalog();
 	}
 
-	// ~CatalogManager() {
-	// 	storeCatalog();
-	// }
+	~CatalogManager() {
+		storeCatalog();
+	}
 
 	string getTableNameByIndexName(string indexName) {
 		return indexes[indexName].tableName;
@@ -254,16 +254,30 @@ public:
 			return TABLE_CATALOG_FILE_WRITE_ERROR;
 		}
 		file.close();
+		string indexName = newTable.tableName + "_" + newTable.primaryKey;
+		createIndex(indexName, newTable.tableName, newTable.primaryKey);
+		storeCatalog();
+		initialCatalog();
 		return SUCCESS;
 	}
 
 	Result dropTable(string tableName) {
-		if(!is_table_exist(tableName))
+		if ( !is_table_exist(tableName) )
 			return TABLE_NAME_NOEXSIT;
+
 		Table& tmpTable = tables[tableName];
-		for(int i = 0; i < tmpTable.indexVector.size(); i++)
+		for ( int i = 0; i < tmpTable.indexVector.size(); i++ )
 			indexes.erase(tmpTable.indexVector[i].indexName);
 		tables.erase(tableName);
+		
+		string indexFileName = INDEX_DIR + tableName + INDEX_SUF;
+		string tableFileName = TABLE_DIR + tableName + TABLE_SUF;
+		remove(indexFileName.c_str());
+		remove(tableFileName.c_str());
+		
+
+		storeCatalog();
+		initialCatalog();
 		return SUCCESS;
 	}
 
@@ -285,21 +299,31 @@ public:
 		tmpTable.indexNum = tmpTable.indexVector.size();
 		indexes.insert(make_pair(newIndex.indexName, newIndex));
 		table_attrToIndex.insert(make_pair(newIndex.tableName + " " + newIndex.attributeName, newIndex.indexName));
+		storeCatalog();
+		initialCatalog();
 		return SUCCESS;
 	}
 
 	Result dropIndex(string indexName) {
-		if(!is_index_exist(indexName))
+		if ( !is_index_exist(indexName) )
 			return INDEX_NAME_NOEXIST;
+
 		Index tmpIndex = get_index(indexName);
-		if(!is_table_exist(tmpIndex.tableName))
+		if ( !is_table_exist(tmpIndex.tableName) )
 			return TABLE_NAME_NOEXSIT;
+
 		Table& tmpTable = tables[tmpIndex.tableName];
-		if(!tmpTable.removeIndex(indexName))
+		if ( !tmpTable.removeIndex(indexName) )
 			return INDEX_NAME_NOEXIST;
 		tmpTable.indexNum = tmpTable.indexVector.size();
 		indexes.erase(indexName);
 		table_attrToIndex.erase(tmpIndex.tableName + " " + tmpIndex.attributeName);
+
+		string indexFileName = INDEX_DIR + indexName + INDEX_SUF;
+		remove(indexFileName.c_str());
+
+		storeCatalog();
+		initialCatalog();
 		return SUCCESS;
 	}
 

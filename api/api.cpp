@@ -11,32 +11,48 @@ string API::fetchStatement() const {
 
 void API::createTable(const string& tableName, const vector<Attribute>& attributes, const string& primaryKey ) {
     // cout << "API::createTable()" << endl;
-    cout << tableName << " " << primaryKey << endl;
-    for ( auto attr : attributes ) {
-        cout << attr.attributeName << " " << attr.isUnique << attr.type.get_type() << endl;
+    // cout << tableName << " " << primaryKey << endl;
+    // for ( auto attr : attributes ) {
+    //     cout << attr.attributeName << " " << attr.isUnique << attr.type.get_type() << endl;
+    // }
+    Result res = catalog_manager.createTable(tableName, primaryKey, attributes);
+    if ( res == TABLE_NAME_EXSITED ) {
+        cout << "createTable error, " << tableName << " already exists" << endl;
     }
-    // catalog_manager.createTable(tableName, primaryKey, attributes);
 }
 
 void API::dropTable(const string& tableName) {
-    cout << "API::dropTable()" << endl;
-    // catalog_manager.dropTable(tableName);
+    Result res = catalog_manager.dropTable(tableName);
+    if ( res == TABLE_NAME_NOEXSIT ) {
+        cout << "dropTable error, " << tableName << " not exists" << endl;
+    }
 }
 
 void API::createIndex(const string& indexName, const string& tableName, const string& attributeName) {
-    cout << "API::createIndex()" << endl;
-    // catalog_manager.createIndex(indexName, tableName, attributeName);
+    Result res = catalog_manager.createIndex(indexName, tableName, attributeName);
+    if ( res == INDEX_NAME_EXSITED ) {
+        cout << "createIndex error, " << indexName << " already exists" << endl;
+    }
+    else if ( res == TABLE_NAME_NOEXSIT ) {
+        cout << "createIndex error, " << tableName << " table name not exist" << endl;
+    }
+    else if ( res == ATTRI_NAME_NOEXSIT ) {
+        cout << "createIndex error, " << attributeName << " attribute name not exist" << endl;
+    }
+    else if ( res == ATTRI_NOT_UNIQUE ) {
+        cout << "createIndex error, " << attributeName << " attribute name not unique" << endl;
+    }
 }
 
 void API::dropIndex(const string& indexName) {
-    cout << "API::dropIndex()" << endl;
-    // catalog_manager.dropIndex(indexName);
+    Result res = catalog_manager.dropIndex(indexName);
+    if ( INDEX_NAME_NOEXIST ) {
+        cout << "dropIndex error, " << indexName << " not exists" << endl;
+    }
 }
 
 void API::selectTuple(const string& tableName, vector<SelectCondition>& selectConditions) const {
-    // cout << "API::selectTuple()" << endl;
     vector<Tuple> res;
-
     // vector<Element> elements1;
     // string s("Alice");
     // Element e1(s), e2(65), e3(12612.1f);
@@ -69,7 +85,7 @@ void API::insertTuple(const string& tableName, Tuple& tuple) {
     //     cout << "\t" << tuple.getData()[i].type << "\t" << tuple.getData()[i].length << endl;
     // }
     Table table = catalog_manager.get_table(tableName);
-    record_manager.insertTuple(table, tuple);
+    Result res = record_manager.insertTuple(table, tuple);
 }
 
 void API::deleteTuple(const string& tableName, vector<SelectCondition>& selectConditions) {
