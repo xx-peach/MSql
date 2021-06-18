@@ -398,7 +398,7 @@ Tuple RecordManager::charToTuple(const Table& table, char* c) {
         tmpElement.setLength(table.attributeVector[i].type.get_length());   // set element length
         tmpElement.charToElement(c);                                        // set element true data
         tuple.push_back_Data(tmpElement);
-        c += table.attributeVector[i].type.get_length();                    // update pointer position
+        c += tmpElement.length;                    // update pointer position
     }
     // recover to original pointer
     c = original;
@@ -421,6 +421,3 @@ void RecordManager::tupleToChar(Tuple& tuple, char* c) {
     // recover to original pointer
     c = original;
 }
-
-// if(table.attributeVector[i].type.get_type() == CHAR)
-//     c++;

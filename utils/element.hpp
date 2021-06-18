@@ -27,7 +27,7 @@ public:
     Element(string& s) {
         type = CHAR;
         char_data = s;
-        length = s.length();
+        length = s.length() + 1;
     }
     
     /* constructor for float */
@@ -74,7 +74,10 @@ public:
     
     /* set the length of the current element */
     void setLength(const int l) {
-        length = l;
+        if ( type == CHAR)
+            length = l + 1;
+        else
+            length = l;
     }
 
     /* write the element to a char array */
@@ -100,8 +103,10 @@ public:
         else if ( type == FLOAT )
             memmove(&float_data, c, length);
         else if ( type == CHAR ) {
-            char_data = string(c);
-            length = char_data.length();
+            char *temp = (char *)malloc(length * sizeof(char));
+            memmove(temp, c, length);
+            char_data = string(temp);
+            free(temp);
         }
     }
 
