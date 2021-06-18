@@ -27,7 +27,7 @@ public:
     Element(string& s) {
         type = CHAR;
         char_data = s;
-        length = s.length() + 1;
+        length = s.length();
     }
     
     /* constructor for float */
@@ -75,7 +75,7 @@ public:
     /* set the length of the current element */
     void setLength(const int l) {
         if ( type == CHAR)
-            length = l + 1;
+            length = l;
         else
             length = l;
     }
