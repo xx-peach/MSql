@@ -63,6 +63,7 @@ enum Result {
     STATEMENT_ERROR = -23,
 
     // API
+    API_FILE_OPEN_FAIL = -41,
 
     // Record
     NO_SUCH_TABLE = -61,

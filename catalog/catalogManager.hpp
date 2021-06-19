@@ -412,7 +412,7 @@ public:
 					return true;
 			// cout << "The attribute " << attributeName << " doesn't exist" << endl;
 		}
-		else
+		// else
 			// cout << "The table " << tableName << " doesn't exist" << endl;
 		return false;
 	}

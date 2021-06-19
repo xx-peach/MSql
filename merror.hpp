@@ -77,6 +77,9 @@ public:
         else if ( m_badValue == INDEX_NAME_NOEXIST ) {
             cout << "CatalogManager::dropIndex error, index not exists" << endl;
         }
+        else if ( m_badValue == API_FILE_OPEN_FAIL ) {
+            cout << "API::fetchFile error, open file fail" << endl;
+        }
     }
 };
 
