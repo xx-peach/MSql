@@ -29,15 +29,23 @@ int main()
     //     cout << "Failed to insert WuFei!" << endl;
 
     cout << table.rowNum << endl;
+
+    vector<SelectCondition> selectConditions;
+    Element hundred_thousand(100000);
+    SelectCondition condition("salary", GREATER, hundred_thousand);
+    selectConditions.push_back(condition);
+
     vector<Tuple> result;
-    if(record_manager.selectTuple(table, result))
+    if(record_manager.selectTuple(table, selectConditions, result))
         cout << "Failed to select!" << endl;
 
     cout << "Number of selected tuples: " << result.size() << endl;
     for( auto it : result) {
         cout << it.getIndex() << ": " << it.getData()[0].elementToString() << "\t" << it.getData()[1].elementToString() << "\t" << it.getData()[2].elementToString() << "\t" << endl;
     }
-    // record_manager.printTable(table);
+
+    cout << "The whole table:" << endl;
+    record_manager.printTable(table);
     
     return 0;
 }

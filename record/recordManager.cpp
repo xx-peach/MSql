@@ -12,7 +12,6 @@ RecordManager::RecordManager(IndexManager& _index_manager, BufferManager& _buffe
  * @function: insert a tuple into the table
  **/
 Result RecordManager::insertTuple(Table& table, Tuple& tuple) {
-    tuple.outputTuple();
     if ( isMatchTheAttribute(table, tuple) == false ) {
         cout << "RecordManager::insertTuple error, tuple attributes do not match the table" << endl;
         return NO_SUCH_ATTR;
@@ -105,13 +104,18 @@ Result RecordManager::selectTupleWithoutIndex(const Table& table, const vector<S
 }
 
 /**
- * @prototype: selectTuple(const Table& table, vector<SelectCondition>& selectConditions, vector<Tuple> tuples);
+ * @prototype: selectTuple(const Table& table, vector<SelectCondition>& selectConditions, vector<Tuple>& tuples);
  * @function: select tuple with condition and index
  **/
-Result RecordManager::selectTuple(const Table& table, vector<SelectCondition>& selectConditions, vector<Tuple> tuples) {
+Result RecordManager::selectTuple(const Table& table, vector<SelectCondition>& selectConditions, vector<Tuple>& tuples) {
+    if(selectConditions.size() == 0)
+        return selectTuple(table, tuples);
     int conditionNum = selectConditions.size();
-    for ( int i = 0; i < conditionNum; i++ )
+    for ( int i = 0; i < conditionNum; i++ ) {
         selectConditions[i].fillAttributeIndex(table.tableName, catalog_manager);
+        if(table.attributeVector[selectConditions[i].attributeIndex].type.get_type() == FLOAT && selectConditions[i].value.type == INT)
+            selectConditions[i].value.setType(FLOAT);
+    }
     vector<bool> isConditionWithIndex(conditionNum, false);
     int cntIndex = 0, cntNormal = 0;
     vector<int> idx;
