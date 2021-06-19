@@ -16,28 +16,28 @@ else()
 endif()
 message(STATUS "Building GENERATED in ${CMAKE_BUILD_TYPE} mode")
 
-# add the executable 
-add_executable(MSql main.cpp)
-
 # add subdirectoy into the ptoject
-add_subdirectory(interpreter)
-add_subdirectory(record)
-add_subdirectory(index)
 add_subdirectory(buffer)
-add_subdirectory(api)
+add_subdirectory(index)
+add_subdirectory(record)
 add_subdirectory(ui)
+add_subdirectory(api)
+add_subdirectory(interpreter)
 # add_subdirectory(catalog)
 # add_subdirectory(utils)
+
+# add the executable 
+add_executable(MSql main.cpp)
 
 # links the object file to the library file
 target_link_libraries(
     MSql PUBLIC
-    interpreter
-    record
-    index
     buffer
-    api
+    index
+    record
     ui
+    api
+    interpreter
     # catalog
     # utils
 )
@@ -45,12 +45,12 @@ target_link_libraries(
 # include the subdirectories
 target_include_directories(
     MSql PUBLIC
-    interpreter
-    record
-    index
     buffer
-    api
+    index
+    record
     ui
+    api
+    interpreter
     # catalog
     # utils
 )
