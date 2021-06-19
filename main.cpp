@@ -42,11 +42,15 @@ int main() {
       if ( statement == "quit;" ) break;
       // execute the statements
       else {
-         interpreter.interpret(statement);
-         // output the total execution time
-         auto end = chrono::system_clock::now();
-         auto duration = chrono::duration_cast<chrono::microseconds>(end - begin);
-         cout << "finish execution in " << double(duration.count()) * chrono::microseconds::period::num / chrono::microseconds::period::den << " seconds" << endl;
+         try {
+            interpreter.interpret(statement);
+            // output the total execution time
+            auto end = chrono::system_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(end - begin);
+            cout << "finish execution in " << double(duration.count()) * chrono::microseconds::period::num / chrono::microseconds::period::den << " seconds" << endl;
+         } catch(MError& e) {
+            e.diagnostic();
+         }
       }
    }
 }

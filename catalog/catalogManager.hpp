@@ -7,7 +7,8 @@
 #include "../utils/attribute.hpp"
 #include "../utils/fieldType.hpp"
 #include "../utils/index.hpp"
-// #include "../IndexManager/IndexManager.hpp"
+#include "../merror.hpp"
+#include "../index/index_manager.hpp"
 
 #include <fstream>
 #include <iomanip>
@@ -41,9 +42,10 @@ private:
 		ifstream file;
 		file.open(tableFileName, ios::in);
 		if ( !file.is_open() ) {
-			cout << "CatalogManager::initialTable error, open file " << tableFileName << " fail" << endl;
+			throw MError(TABLE_CATALOG_FILE_READ_ERROR);
+			// cout << "CatalogMana?ger::initialTable error, open file " << tableFileName << " fail" << endl;
 			// file.close();
-			return TABLE_CATALOG_FILE_READ_ERROR;
+			// return TABLE_CATALOG_FILE_READ_ERROR;
 		}
 		else {
 			string tmpTableName, tmpPrimaryKey;
@@ -95,9 +97,10 @@ private:
 		ifstream file;
 		file.open(indexFileName, ios::in);
 		if ( !file.is_open() ) {
-			cout << "CatalogManager::initialIndex error, open file" << indexFileName << " fail" << endl;
+			throw MError(TABLE_CATALOG_FILE_READ_ERROR);
+			// cout << "CatalogManager::initialIndex error, open file" << indexFileName << " fail" << endl;
 			// file.close();
-			return INDEX_CATALOG_FILE_READ_ERROR;
+			// return INDEX_CATALOG_FILE_READ_ERROR;
 		}
 		else {
 			int tmpBlockNum, tmpRootNum;
@@ -174,9 +177,10 @@ private:
 		ofstream file;
 		file.open(indexFileName, ios::out | ios::trunc);
 		if ( !file.is_open() ) {
-			cout << "CatalogManager::storeIndex, open file " << indexFileName << " fail" << endl;
+			throw MError(INDEX_CATALOG_FILE_WRITE_ERROR);
+			// cout << "CatalogManager::storeIndex, open file " << indexFileName << " fail" << endl;
 			// file.close();
-			return INDEX_CATALOG_FILE_WRITE_ERROR;
+			// return INDEX_CATALOG_FILE_WRITE_ERROR;
 		}
 		else {
 			Index tmpIndex;
@@ -236,27 +240,30 @@ public:
 
 	Result createTable(Table newTable) {
 		if(is_table_exist(newTable.tableName))
-			return TABLE_NAME_EXSITED;
+			throw MError(TABLE_NAME_EXSITED);
+			// return TABLE_NAME_EXSITED;
 		tables.insert(make_pair(newTable.tableName, newTable));
 		ofstream file;
 		string tableFileName = TABLE_DIR + newTable.tableName + TABLE_SUF;
 		file.open(tableFileName, ios::out | ios::trunc);
 		if ( !file.is_open() ) {
-			cout << "CatalogManager::createTable error, open file " << tableFileName << " fail" << endl;
+			throw MError(TABLE_CATALOG_FILE_WRITE_ERROR);
+			// cout << "CatalogManager::createTable error, open file " << tableFileName << " fail" << endl;
 			// file.close();
-			return TABLE_CATALOG_FILE_WRITE_ERROR;
+			// return TABLE_CATALOG_FILE_WRITE_ERROR;
 		}
 		file.close();
 		tableFileName = INDEX_DIR + newTable.tableName + INDEX_SUF;
 		file.open(tableFileName, ios::out | ios::trunc);
 		if ( !file.is_open() ) {
-			cout << "CatalogManager::createTable error, open file " << tableFileName << " fail" << endl;
+			throw MError(TABLE_CATALOG_FILE_WRITE_ERROR);
+			// cout << "CatalogManager::createTable error, open file " << tableFileName << " fail" << endl;
 			// file.close();
-			return TABLE_CATALOG_FILE_WRITE_ERROR;
+			// return TABLE_CATALOG_FILE_WRITE_ERROR;
 		}
 		file.close();
 		string indexName = newTable.tableName + "_" + newTable.primaryKey;
-		// createIndex(indexName, newTable.tableName, newTable.primaryKey);
+		createIndex(indexName, newTable.tableName, newTable.primaryKey);
 		storeCatalog();
 		initialCatalog();
 		return SUCCESS;
@@ -264,7 +271,8 @@ public:
 
 	Result dropTable(string tableName) {
 		if ( !is_table_exist(tableName) )
-			return TABLE_NAME_NOEXSIT;
+			throw MError(TABLE_NAME_NOEXSIT);
+			// return TABLE_NAME_NOEXSIT;
 
 		Table& tmpTable = tables[tableName];
 		for ( int i = 0; i < tmpTable.indexVector.size(); i++ )

@@ -9,6 +9,7 @@
 #define _INTERPRETER_H_
 
 #include "../api/api.hpp"
+#include "../merror.hpp"
 
 class Interpreter {
 private:
