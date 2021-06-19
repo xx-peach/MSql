@@ -1,0 +1,2 @@
+/usr/bin/ar qc libgenerated.a  CMakeFiles/generated.dir/MSqlParserBaseListener.cpp.o CMakeFiles/generated.dir/MSqlParserBaseVisitor.cpp.o CMakeFiles/generated.dir/MSqlParserListener.cpp.o CMakeFiles/generated.dir/MSqlParserVisitor.cpp.o CMakeFiles/generated.dir/MSqlParser.cpp.o CMakeFiles/generated.dir/MSqlLexer.cpp.o
+/usr/bin/ranlib libgenerated.a
