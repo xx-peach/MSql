@@ -10,6 +10,7 @@
 #include <queue>
 #include <memory>
 #include <typeinfo>
+#include <type_traits>
 using namespace std;
 
 template <class T>
@@ -117,15 +118,16 @@ Node<T>::Node(int order, block_t block_index, char* block_head, int size_of_type
         this->childs_index[0] = *(block_t*)(block_head + i);//not leaf:child[0]
         i += sizeof(block_t);
     }    
-
+    char* temp;
+    string st;
     for(int j=0; j < this->element_num; j++){//order of childs
-        if (typeid(T)==typeid(char*)){//char*
-            char* temp = new char[size_of_type+1];
-            memcpy(temp,block_head+i,size_of_type);//string data
+        st = block_head+i;
+        if constexpr (std::is_same<typename std::decay<T>::type, char*>::value){//char*
+            temp = new char[size_of_type+1];
+            memcpy(temp,st.c_str(),size_of_type);//string data
             temp[size_of_type] = '\0';//ensure to be string
             this->element[j] = temp;
             i += size_of_type;
-            delete[] temp;
         }else{//float or int
             this->element[j] = *((T*)(block_head + i));//float or int data
             i += sizeof(T);

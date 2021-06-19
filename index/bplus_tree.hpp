@@ -121,12 +121,13 @@ void BPlusTree<T>::WriteNodeBackToBuffer(std::shared_ptr<Node<T>>& node){
         *((block_t*)(block_head+i)) = node->childs_index[0];
         i += sizeof(block_t);
     }
+    string st;
     //reverse process of node constructor function
     for(int j=0; j < node->element_num; j++){
-        if (typeid(T)==typeid(char*)){//string
-            memcpy(block_head + i,node->element[j],size_of_type);//copy into block
+        st = node->element[j];
+        if  constexpr (std::is_same<typename std::decay<T>::type, char*>::value){//string
+            memcpy(block_head + i,st.c_str(),size_of_type);//copy into block
             i += size_of_type;
-            delete[] temp;
         }else{//float or int
             *((T*)(block_head + i)) = node->element[j];
             i += sizeof(T);
