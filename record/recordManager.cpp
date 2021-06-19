@@ -4,8 +4,8 @@
  * @prototype: RecordManager(IndexManager& _index_manager, BufferManager& _buffer_manager);
  * @function: the only needed constructor
  **/
-RecordManager::RecordManager(IndexManager& _index_manager, BufferManager& _buffer_manager, CatalogManager& _catalog_manager):
-                             index_manager(_index_manager), buffer_manager(_buffer_manager), catalog_manager(_catalog_manager) {}
+RecordManager::RecordManager(/*IndexManager& _index_manager, */BufferManager& _buffer_manager, CatalogManager& _catalog_manager):
+                             /*index_manager(_index_manager), */buffer_manager(_buffer_manager), catalog_manager(_catalog_manager) {}
 
 /**
  * @prototype: insertTuple(Table& table, Tuple& tuple);
@@ -33,6 +33,8 @@ Result RecordManager::insertTuple(Table& table, Tuple& tuple) {
         return ERROR;
     }
     table.rowNum++;
+    catalog_manager.storeCatalog();
+    catalog_manager.initialCatalog();
     return SUCCESS;
 }
 
@@ -188,8 +190,8 @@ int RecordManager::deleteTuple(Table& table, vector<SelectCondition>& selectCond
     for ( int i = 0; i < attrNum; i++ ) {
         if ( !table.attributeVector[i].isUnique )
             continue;
-        /*if ( index_manager.isIndexExist(table.tableName, table.attributeVector[i].attributeName, table.attributeVector[i].type) )
-            attrIndex.push_back(i);*/
+        if ( catalog_manager.is_index_exist(table.tableName, table.attributeVector[i].attributeName) )
+            attrIndex.push_back(i);
     }
     int deleteNum = searchResult.size();
     for ( int i = 0; i < deleteNum; i++ ) {
@@ -201,6 +203,8 @@ int RecordManager::deleteTuple(Table& table, vector<SelectCondition>& selectCond
 		    index_manager.deleteIndex(table.tableName, table.attributeVector[attrIndex[j]].attributeName, table.attributeVector[attrIndex[j]].type, tuple.getData()[attrIndex[j]].elementToString());*/
     }
     table.rowNum -= deleteNum;
+    catalog_manager.storeCatalog();
+    catalog_manager.initialCatalog();
     return deleteNum;
 }
 
@@ -214,7 +218,7 @@ vector<int> RecordManager::selectWithIndex(const Table& table, SelectCondition& 
     idx.clear();
     char* con_value = (char*)malloc(condition.value.length * sizeof(char));
     condition.value.elementToChar(con_value);
-    index_manager.compare(table.tableName, table.attributeVector[condition.attributeIndex].attributeName, table.attributeVector[condition.attributeIndex].type, con_value, idx, condition.conditionType);
+    // index_manager.compare(table.tableName, table.attributeVector[condition.attributeIndex].attributeName, table.attributeVector[condition.attributeIndex].type, con_value, idx, condition.conditionType);
     return idx;
 }
 
@@ -253,13 +257,14 @@ bool RecordManager::writeToBuffer(string tableName, int rowNum, char* data, int 
 
 bool RecordManager::readFromBuffer(string tableName, int rowNum, char* data, int rowLength) {
     fiter file = buffer_manager.getFile(tableName, 0, rowLength, rowNum);
-    int block_num = buffer_manager.getBlockNums(file);
     int idx = rowNum / (block_size / rowLength);
-    if ( block_num <= idx )
-        return false;
+    while ( buffer_manager.getBlockNums(file) <= idx ) {
+        biter new_block = buffer_manager.getBlock(file);
+        (*new_block)->read();
+    }
     int offset = rowNum % (block_size / rowLength);
     biter block = buffer_manager.getBlockbyOffset(file, idx);
-    memmove(data, (*block)->data, rowLength);
+    memmove(data, &((*block)->data[rowNum*rowLength]), rowLength);
     return true;
 }
 
@@ -306,17 +311,17 @@ bool RecordManager::isConflictTheUnique(const Table& table, Tuple& tuple) {
     for(int i = 0; i < attrNum; i++){
         if(!table.attributeVector[i].isUnique)
             continue;
-        if(catalog_manager.is_index_exist(table.tableName, table.attributeVector[i].attributeName)) { // Use index to find directly
+        /*if(catalog_manager.is_index_exist(table.tableName, table.attributeVector[i].attributeName)) { // Use index to find directly
             vector<int> idx;
             idx.clear();
             if(index_manager.find_element(table.tableName, table.attributeVector[i].attributeName, table.attributeVector[i].type, value, idx) == SUCCESS)
                 return true;
-        } else { // Iteration without index
+        } else { // Iteration without index*/
             for(int j = 0; j < table.rowNum; j++){
                 Tuple tmpTuple = getTupleByRowNumber(table, j);
                 if (tmpTuple.getData()[i] == tuple.getData()[i])
                     return true;
-            }
+            // }
         }
     }
     return false;

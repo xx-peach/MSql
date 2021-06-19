@@ -160,8 +160,9 @@ private:
 				for ( int i = 0; i < tmpTable.indexNum; i++ ) {
 					Index tmpIndex = tmpTable.indexVector.at(i);
 					file << left << setw(15) << tmpIndex.indexName;
-					file << left << setw(15) << tmpIndex.attributeName << endl << endl;
+					file << left << setw(15) << tmpIndex.attributeName << endl;
 				}
+				cout << endl;
 			}
 			file.close();
 			return SUCCESS;
@@ -405,11 +406,11 @@ public:
 		return false;
 	}
 
-	Table get_table(string tableName) {
+	Table& get_table(string tableName) {
 		return tables[tableName];
 	}
 
-	Index get_index(string indexName) {
+	Index& get_index(string indexName) {
 		return indexes[indexName];
 	}
 
