@@ -61,19 +61,19 @@ NumType Interpreter::getType(const string& s) {
  * @prototype: getElement(const string&);
  * @function: construct an Element object from a given string
  **/
-CMP Interpreter::getLogic(const string& s) {
-    if ( s == ">=" ) 
+CMP Interpreter::getLogic(const string& s1, const string& s2) {
+    if ( s1 == ">" && s2 == "=" ) 
         return GREATER_EQUAL;
-    else if ( s == "<=" )
+    else if ( s1 == "<" && s2 == "=" )
         return LESS_EQUAL;
-    else if ( s == "<>" )
+    else if ( s1 == "<" && s2 == ">" )
         return NOT_EQUAL;
-    else if ( s == ">" )
+    else if ( s1 == ">" && s2 != "=" && s2 != ">" && s2 != "<" )
         return GREATER;
-    else if ( s == "=" )
-        return EQUAL;
-    else if ( s == "<" )
+    else if ( s1 == "<" && s2 != "=" && s2 != ">" && s2 != "<" )
         return LESS;
+    else if ( s1 == "=" && s2 != "=" && s2 != ">" && s2 != "<" )
+        return EQUAL;
     else
         return ERROR_CMP;
 }
@@ -284,7 +284,8 @@ void Interpreter::interpret(const string& s) {
                             // get attribute name
                             ++i; string attributeName = tokenList[i];
                             // get logic operator name
-                            ++i; CMP logicType = getLogic(tokenList[i]);
+                            ++i; CMP logicType = getLogic(tokenList[i], tokenList[i+1]);
+                            if ( logicType == GREATER_EQUAL || logicType == NOT_EQUAL || logicType == LESS_EQUAL ) ++i;
                             if ( logicType == ERROR_CMP ) {
                                 throw MError(LOGICTYPE_ERROR);
                                 // cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
@@ -367,7 +368,8 @@ void Interpreter::interpret(const string& s) {
                         // get attribute name
                         ++i; string attributeName = tokenList[i];
                         // get logic operator name
-                        ++i; CMP logicType = getLogic(tokenList[i]);
+                        ++i; CMP logicType = getLogic(tokenList[i], tokenList[i+1]);
+                        if ( logicType == GREATER_EQUAL || logicType == NOT_EQUAL || logicType == LESS_EQUAL ) ++i;
                         if ( logicType == ERROR_CMP ) {
                             throw MError(LOGICTYPE_ERROR);
                             // cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
