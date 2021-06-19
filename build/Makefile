@@ -163,19 +163,6 @@ antlr4_cpp_runtime/fast:
 .PHONY : antlr4_cpp_runtime/fast
 
 #=============================================================================
-# Target rules for targets named buffer
-
-# Build rule for target.
-buffer: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 buffer
-.PHONY : buffer
-
-# fast build rule for target.
-buffer/fast:
-	$(MAKE) -f buffer/CMakeFiles/buffer.dir/build.make buffer/CMakeFiles/buffer.dir/build
-.PHONY : buffer/fast
-
-#=============================================================================
 # Target rules for targets named record
 
 # Build rule for target.
@@ -200,6 +187,19 @@ index: cmake_check_build_system
 index/fast:
 	$(MAKE) -f index/CMakeFiles/index.dir/build.make index/CMakeFiles/index.dir/build
 .PHONY : index/fast
+
+#=============================================================================
+# Target rules for targets named buffer
+
+# Build rule for target.
+buffer: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 buffer
+.PHONY : buffer
+
+# fast build rule for target.
+buffer/fast:
+	$(MAKE) -f buffer/CMakeFiles/buffer.dir/build.make buffer/CMakeFiles/buffer.dir/build
+.PHONY : buffer/fast
 
 #=============================================================================
 # Target rules for targets named api
@@ -266,9 +266,9 @@ help:
 	@echo "... interpreter"
 	@echo "... generated"
 	@echo "... antlr4_cpp_runtime"
-	@echo "... buffer"
 	@echo "... record"
 	@echo "... index"
+	@echo "... buffer"
 	@echo "... api"
 	@echo "... ui"
 	@echo "... main.o"

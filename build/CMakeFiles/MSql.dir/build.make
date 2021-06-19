@@ -81,8 +81,8 @@ MSql: CMakeFiles/MSql.dir/main.cpp.o
 MSql: CMakeFiles/MSql.dir/build.make
 MSql: interpreter/libinterpreter.a
 MSql: record/librecord.a
-MSql: buffer/libbuffer.a
 MSql: index/libindex.a
+MSql: buffer/libbuffer.a
 MSql: api/libapi.a
 MSql: ui/libui.a
 MSql: interpreter/generated/libgenerated.a

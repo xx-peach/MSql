@@ -44,17 +44,17 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/mnt/c/Users/think/minisql_proj/new/MSql-redefinition/MSql/build/buffer/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
   include("/mnt/c/Users/think/minisql_proj/new/MSql-redefinition/MSql/build/record/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
   include("/mnt/c/Users/think/minisql_proj/new/MSql-redefinition/MSql/build/index/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/mnt/c/Users/think/minisql_proj/new/MSql-redefinition/MSql/build/buffer/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)

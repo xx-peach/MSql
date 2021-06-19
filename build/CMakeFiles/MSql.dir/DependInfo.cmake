@@ -12,8 +12,8 @@ set(CMAKE_CXX_COMPILER_ID "GNU")
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../interpreter"
   "../record"
-  "../buffer"
   "../index"
+  "../buffer"
   "../api"
   "../ui"
   "../interpreter/generated"
@@ -25,8 +25,8 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
 set(CMAKE_TARGET_LINKED_INFO_FILES
   "/mnt/c/Users/think/minisql_proj/new/MSql-redefinition/MSql/build/interpreter/CMakeFiles/interpreter.dir/DependInfo.cmake"
   "/mnt/c/Users/think/minisql_proj/new/MSql-redefinition/MSql/build/record/CMakeFiles/record.dir/DependInfo.cmake"
-  "/mnt/c/Users/think/minisql_proj/new/MSql-redefinition/MSql/build/buffer/CMakeFiles/buffer.dir/DependInfo.cmake"
   "/mnt/c/Users/think/minisql_proj/new/MSql-redefinition/MSql/build/index/CMakeFiles/index.dir/DependInfo.cmake"
+  "/mnt/c/Users/think/minisql_proj/new/MSql-redefinition/MSql/build/buffer/CMakeFiles/buffer.dir/DependInfo.cmake"
   "/mnt/c/Users/think/minisql_proj/new/MSql-redefinition/MSql/build/api/CMakeFiles/api.dir/DependInfo.cmake"
   "/mnt/c/Users/think/minisql_proj/new/MSql-redefinition/MSql/build/ui/CMakeFiles/ui.dir/DependInfo.cmake"
   "/mnt/c/Users/think/minisql_proj/new/MSql-redefinition/MSql/build/interpreter/generated/CMakeFiles/generated.dir/DependInfo.cmake"

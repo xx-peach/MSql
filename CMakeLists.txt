@@ -21,9 +21,9 @@ add_executable(MSql main.cpp)
 
 # add subdirectoy into the ptoject
 add_subdirectory(interpreter)
-add_subdirectory(buffer)
 add_subdirectory(record)
 add_subdirectory(index)
+add_subdirectory(buffer)
 add_subdirectory(api)
 add_subdirectory(ui)
 # add_subdirectory(catalog)
@@ -34,8 +34,8 @@ target_link_libraries(
     MSql PUBLIC
     interpreter
     record
-    buffer
     index
+    buffer
     api
     ui
     # catalog
@@ -47,8 +47,8 @@ target_include_directories(
     MSql PUBLIC
     interpreter
     record
-    buffer
     index
+    buffer
     api
     ui
     # catalog
