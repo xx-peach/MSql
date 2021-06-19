@@ -52,7 +52,6 @@ public:
     void printTable(const Table& table);
 
 private:
-    //IndexManager& index_manager;
     BufferManager& buffer_manager;
     CatalogManager& catalog_manager;
     IndexManager& index_manager;

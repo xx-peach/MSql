@@ -2,12 +2,16 @@
 #include "../buffer/buffer.hpp"
 #include "../catalog/catalogManager.hpp"
 #include "../record/recordManager.hpp"
+#include "../index/bplus_tree.hpp"
+#include "../index/index_manager.hpp"
+#include "../index/node.hpp"
 #include <fstream>
 int main()
 {
+    IndexManager index_manager;
     BufferManager buffer_manager;
     CatalogManager catalog_manager;
-    RecordManager record_manager(buffer_manager, catalog_manager);
+    RecordManager record_manager(index_manager, buffer_manager, catalog_manager);
     if(catalog_manager.initialCatalog())
         cout << "Initialize error!" << endl;
     
