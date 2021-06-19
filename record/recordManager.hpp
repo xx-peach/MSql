@@ -16,7 +16,7 @@
 #include "../utils/table.hpp"
 #include "../buffer/buffer.hpp"
 #include "../catalog/catalogManager.hpp"
-#include "../index/index_manager.hpp"
+// #include "../index/index_manager.hpp"
 
 #include <string>
 #include <algorithm>
@@ -24,7 +24,7 @@
 class RecordManager {
 public:
     /* constructor */
-    RecordManager(IndexManager& index_manager, BufferManager& buffer_manager, CatalogManager& catalog_manager);
+    RecordManager(/*IndexManager& index_manager, */BufferManager& buffer_manager, CatalogManager& catalog_manager);
 
     /* Insert using tuple or string */
     Result insertTuple(Table& table, Tuple& tuple);
@@ -52,7 +52,7 @@ public:
     void printTable(const Table& table);
 
 private:
-    IndexManager& index_manager;
+    // IndexManager& index_manager;
     BufferManager& buffer_manager;
     CatalogManager& catalog_manager;
     bool judgeCondition(string tableName, Tuple& tuple, SelectCondition& condition);
