@@ -1,16 +1,18 @@
+abc a 0 3
+a              CHAR   10   1 
+b              INT    4    0 
+c              FLOAT  4    0 
+0
 employee name 0 3
 name           CHAR   10   1 
 age            INT    4    0 
 salary         FLOAT  4    0 
 1
 idx_name       name           
-
 test id 0 3
 id             INT    4    1 
 name           CHAR   30   1 
 salary         FLOAT  4    0 
 2
 test_id        id             
-
 t_name         name           
-

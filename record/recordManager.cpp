@@ -4,14 +4,15 @@
  * @prototype: RecordManager(IndexManager& _index_manager, BufferManager& _buffer_manager);
  * @function: the only needed constructor
  **/
-RecordManager::RecordManager(/*IndexManager& _index_manager, */BufferManager& _buffer_manager, CatalogManager& _catalog_manager):
-                             /*index_manager(_index_manager), */buffer_manager(_buffer_manager), catalog_manager(_catalog_manager) {}
+RecordManager::RecordManager(IndexManager& _index_manager, BufferManager& _buffer_manager, CatalogManager& _catalog_manager):
+                             index_manager(_index_manager), buffer_manager(_buffer_manager), catalog_manager(_catalog_manager) {}
 
 /**
  * @prototype: insertTuple(Table& table, Tuple& tuple);
  * @function: insert a tuple into the table
  **/
 Result RecordManager::insertTuple(Table& table, Tuple& tuple) {
+    tuple.outputTuple();
     if ( isMatchTheAttribute(table, tuple) == false ) {
         cout << "RecordManager::insertTuple error, tuple attributes do not match the table" << endl;
         return NO_SUCH_ATTR;

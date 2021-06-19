@@ -61,6 +61,15 @@ public:
     void setIndex(int i) {
         index = i;
     }
+
+    void outputTuple(){
+        cout << "index = " << index << ", data = ";
+        for(int i=0; i<data.size(); i++){
+            data[i].printElement();
+            cout << ", ";
+        }
+        cout << endl;
+    }
 };
 
 #endif

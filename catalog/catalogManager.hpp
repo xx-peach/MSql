@@ -256,7 +256,7 @@ public:
 		}
 		file.close();
 		string indexName = newTable.tableName + "_" + newTable.primaryKey;
-		createIndex(indexName, newTable.tableName, newTable.primaryKey);
+		// createIndex(indexName, newTable.tableName, newTable.primaryKey);
 		storeCatalog();
 		initialCatalog();
 		return SUCCESS;

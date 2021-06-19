@@ -28,7 +28,10 @@ Element Interpreter::getElement(string& s) {
         s = s.substr(1, s.size()-2);
         return Element(s);
     }
-    else {
+    else if ( s.find_first_of("\"") != -1){
+        s = s.substr(1, s.size()-2);
+        return Element(s);
+    }else {
         return Element(atoi(s.c_str()));
     }
 }
