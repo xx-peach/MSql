@@ -20,13 +20,13 @@ message(STATUS "Building GENERATED in ${CMAKE_BUILD_TYPE} mode")
 add_executable(MSql main.cpp)
 
 # add subdirectoy into the ptoject
-add_subdirectory(api)
-add_subdirectory(buffer)
-# add_subdirectory(catalog)
-# add_subdirectory(index)
 add_subdirectory(interpreter)
+add_subdirectory(buffer)
 add_subdirectory(record)
+add_subdirectory(index)
+add_subdirectory(api)
 add_subdirectory(ui)
+# add_subdirectory(catalog)
 # add_subdirectory(utils)
 
 # links the object file to the library file

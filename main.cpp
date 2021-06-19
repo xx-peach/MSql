@@ -1,4 +1,5 @@
 #include "./interpreter/interpreter.hpp"
+#include "./index/index_manager.hpp"
 #include <iostream>
 #include <chrono>
 
@@ -7,9 +8,10 @@ using namespace std;
 int main() {
    /* instantiate all the needed objects */
    UI ui;
+   IndexManager index_manager;
    BufferManager buffer_manager;
    CatalogManager catalog_manager;
-   RecordManager record_manager(buffer_manager, catalog_manager);
+   RecordManager record_manager(index_manager, buffer_manager, catalog_manager);
    API api(catalog_manager, record_manager, ui);
    Interpreter interpreter(api);
 

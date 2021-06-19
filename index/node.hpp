@@ -21,7 +21,7 @@ public:
     block_t parent_index;           //index of parent, -1 for null
     bool is_leaf;                   //true if it is leaf node
     block_t next_leaf_index;        //index of leaf node, -1 for null
-    int element_num;                //number of elements
+    int element_num;             //number of elements
     vector<T> element;              //list of elements
     vector<block_t> childs_index;   //indexs of child blocks, -1 for null
     vector<int> offset;             //offset for record

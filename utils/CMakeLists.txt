@@ -4,9 +4,9 @@ if(NOT UNIX)
 endif()
 
 cmake_minimum_required(VERSION 3.16)
-project(index)
+project(utils)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
@@ -16,25 +16,27 @@ else()
 endif()
 message(STATUS "Building GENERATED in ${CMAKE_BUILD_TYPE} mode")
 
-set(INDEX index CACHE INTERNAL "")
-set(INDEX_SRC
-    bplus_tree.cpp
-    bplus_tree.hpp
-    index_manager.hpp
-    index_manager.cpp
-    node.hpp
+set(UTILS utils CACHE INTERNAL "")
+set(UTILS_SRC
+    attribute.hpp
+    element.hpp
+    fieldType.hpp
+    index.hpp
+    selectCondition.hpp
+    table.hpp
+    tuple.hpp
 )
 
 # add the variables into the library
-add_library(${INDEX} ${INDEX_SRC})
+add_library(${UTILS} ${UTILS_SRC})
 
 # links the object file to the library file
 target_link_libraries(
-    ${INDEX} PUBLIC
+    ${UTILS} PUBLIC
 )
 
 # include directories
 target_include_directories(
-    ${INDEX} PUBLIC
+    ${UTILS} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
