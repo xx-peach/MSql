@@ -28,7 +28,7 @@ public:
     ~API();
 
     string fetchStatement() const;
-    vector<string> fetchFile(string);
+    vector<string> fetchFile(const string&) const;
     void createTable(const string&, const vector<Attribute>&, const string&);
     void dropTable(const string&);
     void createIndex(const string&, const string&, const string&);

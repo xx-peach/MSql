@@ -10,14 +10,13 @@ string API::fetchStatement() const {
     return ui.fetchStatement();
 }
 
-vector<string> API::fetchFile(string fileName) {
+vector<string> API::fetchFile(const string& fileName) const {
     vector <string> ret;
-    
-    ifstream inFile(fileName);
+    ifstream inFile(TEST_DIR + fileName);
     if ( inFile.is_open() ) {
         string t;
         while ( getline(inFile, t) ) {
-            ret.push_back(t);
+            ret.push_back(t.substr(0, t.size()-1));
         }
         inFile.close();
         return ret;

@@ -44,6 +44,8 @@ Result RecordManager::insertTuple(Table& table, Tuple& tuple) {
  **/
 Result RecordManager::insertTuple(Table& table, vector<pair<NumType, string>>& tupleString) {
     if ( tupleString.size() != table.attributeNum ) {
+        // cout << "tupleString.size(): " << tupleString.size() << endl;
+        // cout << "table.attributeNum: " << table.attributeNum << endl;
         cout << "RecordManager::insertTuple error, tuple attributes do not match the table" << endl;
         return ATTR_NUM_NOT_MATCH;
     }
@@ -56,8 +58,8 @@ Result RecordManager::insertTuple(Table& table, vector<pair<NumType, string>>& t
         }
         if ( table.attributeVector[i].type.get_type() != tupleString[i].first ) {
             cout << "RecordManager::insertTuple error, tuple attributes do not match the table" << endl;
-            cout << "getType: " << table.attributeVector[i].type.get_type() << "    ";
-            cout << "first: " << tupleString[i].first << endl;
+            // cout << "getType: " << table.attributeVector[i].type.get_type() << "    ";
+            // cout << "first: " << tupleString[i].first << endl;
             return NO_SUCH_ATTR;
         }
         Element e;

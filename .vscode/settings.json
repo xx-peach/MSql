@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "*.m": "matlab",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "ostream": "cpp"
     }
 }

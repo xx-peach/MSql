@@ -56,6 +56,7 @@ int main() {
          for ( auto i : instLists ) {
             if ( i == "quit;" ) return 0;
             try {
+               cout << i << endl;
                interpreter.interpret(i);
             } catch(MError& e) {
                e.diagnostic();

@@ -109,6 +109,7 @@ void Interpreter::interpret(const string& s) {
     for ( int i = 0; i < tokens.size(); i++ ) {
         string t = tempList[i]->getText();
         if ( isSpace(t) || t == "(" || t == "," || t == ")" || t == ";" || t == "<EOF>" ) continue;
+        // else if ( !t.size() || t == "" || t == "\0" ) continue;
         else tokenList.push_back(t);
     }
     /* signals */
@@ -334,8 +335,11 @@ void Interpreter::interpret(const string& s) {
             else {
                 ++i; vector<pair<NumType, string>> tupleString;
                 for ( ; i < tokenList.size(); i++ ) {
+                    // cout << "Type: " << getType(tokenList[i]);
+                    // cout << ", string: " << tokenList[i] << endl;
                     tupleString.push_back(make_pair(getType(tokenList[i]), tokenList[i]));
                 }
+                // cout << "this" << endl;
                 api.insertTuple(tableName, tupleString);
             }
         }
