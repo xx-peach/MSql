@@ -28,11 +28,32 @@ Element Interpreter::getElement(string& s) {
         s = s.substr(1, s.size()-2);
         return Element(s);
     }
-    else if ( s.find_first_of("\"") != -1){
+    else if ( s.find_first_of("\"") != -1 ) {
         s = s.substr(1, s.size()-2);
         return Element(s);
-    }else {
+    }
+    else {
         return Element(atoi(s.c_str()));
+    }
+}
+
+
+/**
+ * @prototype: getElement(const string&);
+ * @function: construct an Element object from a given string
+ **/
+NumType Interpreter::getType(const string& s) {
+    if ( s.find_first_of(".") != -1 ) {
+        return FLOAT;
+    }
+    else if ( s.find_first_of("'") != -1 ) {
+        return CHAR;
+    }
+    else if ( s.find_first_of("\"") != -1) {
+        return CHAR;
+    }
+    else {
+        return INT;
     }
 }
 
@@ -310,13 +331,11 @@ void Interpreter::interpret(const string& s) {
                 // return;
             }
             else {
-                ++i; vector<Element> elements;
+                ++i; vector<pair<NumType, string>> tupleString;
                 for ( ; i < tokenList.size(); i++ ) {
-                    Element tmpElement = getElement(tokenList[i]);
-                    elements.push_back(tmpElement);
+                    tupleString.push_back(make_pair(getType(tokenList[i]), tokenList[i]));
                 }
-                Tuple tuple = Tuple(elements);
-                api.insertTuple(tableName, tuple);
+                api.insertTuple(tableName, tupleString);
             }
         }
     }

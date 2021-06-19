@@ -56,6 +56,8 @@ Result RecordManager::insertTuple(Table& table, vector<pair<NumType, string>>& t
         }
         if ( table.attributeVector[i].type.get_type() != tupleString[i].first ) {
             cout << "RecordManager::insertTuple error, tuple attributes do not match the table" << endl;
+            cout << "getType: " << table.attributeVector[i].type.get_type() << "    ";
+            cout << "first: " << tupleString[i].first << endl;
             return NO_SUCH_ATTR;
         }
         Element e;

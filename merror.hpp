@@ -50,6 +50,9 @@ public:
         else if ( m_badValue == STATEMENT_ERROR ) {
             cout << "Interpreter::interpret error, expecting {create, drop, select, insert, delete}" << endl;
         }
+        else if ( m_badValue == TABLE_NAME_EXSITED ) {
+            cout << "CatalogManager::createTable error, table already exists" << endl;
+        }
         else if ( m_badValue == TABLE_NAME_NOEXSIT ) {
             cout << "CatalogManager::dropTable error, table not exists" << endl;
         }
@@ -62,8 +65,17 @@ public:
         else if ( m_badValue == TABLE_CATALOG_FILE_WRITE_ERROR ) {
             cout << "CatalogManager::createTable error, open file fail" << endl;
         }
-        else if ( m_badValue == TABLE_NAME_EXSITED ) {
-            cout << "CatalogManager::createTable error, table already exists" << endl;
+        else if ( m_badValue == INDEX_NAME_EXSITED ) {
+            cout << "CatalogManager::createIndex error, index already exists" << endl;
+        }
+        else if ( m_badValue == ATTRI_NAME_NOEXSIT ) {
+            cout << "CatalogManager::createIndex error, attribute not exists" << endl;
+        }
+        else if ( m_badValue == ATTRI_NOT_UNIQUE ) {
+            cout << "CatalogManager::createIndex error, attribute is not unique" << endl;
+        }
+        else if ( m_badValue == INDEX_NAME_NOEXIST ) {
+            cout << "CatalogManager::dropIndex error, index not exists" << endl;
         }
     }
 };

@@ -84,15 +84,14 @@ void API::selectTuple(const string& tableName, vector<SelectCondition>& selectCo
     ui.plotTable(res, titles);
 }
 
-void API::insertTuple(const string& tableName, Tuple& tuple) {
+void API::insertTuple(const string& tableName, vector<pair<NumType, string>>& tupleString) {
     // cout << "API::insertTuple()" << endl;
     // cout << tuple.getData().size() << endl;
     // for ( int i = 0; i < tuple.getData().size(); i++ ) {
     //     tuple.getData()[i].printElement();
     //     cout << "\t" << tuple.getData()[i].type << "\t" << tuple.getData()[i].length << endl;
     // }
-    Table table = catalog_manager.get_table(tableName);
-    Result res = record_manager.insertTuple(table, tuple);
+    Result res = record_manager.insertTuple(catalog_manager.get_table(tableName), tupleString);
 }
 
 void API::deleteTuple(const string& tableName, vector<SelectCondition>& selectConditions) {

@@ -1,4 +1,4 @@
-employee name 0 3
+employee name 4 3
 name           CHAR   10   1 
 age            INT    4    0 
 salary         FLOAT  4    0 
