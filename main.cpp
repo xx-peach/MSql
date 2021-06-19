@@ -8,11 +8,11 @@ using namespace std;
 int main() {
    /* instantiate all the needed objects */
    UI ui;
-   IndexManager index_manager;
    BufferManager buffer_manager;
+   IndexManager index_manager(buffer_manager);
    CatalogManager catalog_manager;
    RecordManager record_manager(index_manager, buffer_manager, catalog_manager);
-   API api(catalog_manager, record_manager, ui);
+   API api(catalog_manager, record_manager, index_manager, ui);
    Interpreter interpreter(api);
 
    /* print the welcome prompt when first enters the system */

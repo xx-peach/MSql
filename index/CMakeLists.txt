@@ -18,10 +18,10 @@ message(STATUS "Building GENERATED in ${CMAKE_BUILD_TYPE} mode")
 
 set(INDEX index CACHE INTERNAL "")
 set(INDEX_SRC
+    index_manager.cpp
+    index_manager.hpp
     bplus_tree.cpp
     bplus_tree.hpp
-    index_manager.hpp
-    index_manager.cpp
     node.hpp
 )
 

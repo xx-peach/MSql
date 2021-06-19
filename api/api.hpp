@@ -10,6 +10,7 @@
 
 #include "../record/recordManager.hpp"
 #include "../catalog/catalogManager.hpp"
+#include "../index/index_manager.hpp"
 #include "../ui/ui.hpp"
 #include <vector>
 using namespace std;
@@ -19,9 +20,10 @@ private:
     UI& ui;
     RecordManager& record_manager;
     CatalogManager& catalog_manager;
+    IndexManager& index_manager;
 public:
     API();
-    API(CatalogManager&, RecordManager&, UI&);
+    API(CatalogManager&, RecordManager&,IndexManager&, UI&);
 
     ~API();
 

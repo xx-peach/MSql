@@ -10,7 +10,7 @@ using namespace std;
 
 class IndexManager{
     public:
-        IndexManager();     // ctor
+        IndexManager(BufferManager& buffer_manager);     // ctor
         ~IndexManager();    // dtor
         
         //create index
@@ -33,6 +33,7 @@ class IndexManager{
         
 
     private:
+        BufferManager& buffer_manager;
         //some map of index
         map<string, shared_ptr<BPlusTree<int>>> int_index;//one string map a ptr to b+ tree
         map<string, shared_ptr<BPlusTree<float>>>float_index;

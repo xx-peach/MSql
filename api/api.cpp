@@ -1,7 +1,7 @@
 #include "./api.hpp"
 
-API::API(CatalogManager& _catalog_manager, RecordManager& _record_manager, UI& _ui):
-         catalog_manager(_catalog_manager), record_manager(_record_manager), ui(_ui) {}
+API::API(CatalogManager& _catalog_manager, RecordManager& _record_manager, IndexManager& _index_manager, UI& _ui):
+         catalog_manager(_catalog_manager), record_manager(_record_manager),index_manager(_index_manager), ui(_ui) {}
 
 API::~API() = default;
 
@@ -30,6 +30,8 @@ void API::dropTable(const string& tableName) {
 
 void API::createIndex(const string& indexName, const string& tableName, const string& attributeName) {
     Result res = catalog_manager.createIndex(indexName, tableName, attributeName);
+    FieldType ft = catalog_manager.getTypeByIndexName(indexName);
+    Result ires = index_manager.create_index(tableName,attributeName,ft);
     if ( res == INDEX_NAME_EXSITED ) {
         cout << "createIndex error, " << indexName << " already exists" << endl;
     }
@@ -41,6 +43,11 @@ void API::createIndex(const string& indexName, const string& tableName, const st
     }
     else if ( res == ATTRI_NOT_UNIQUE ) {
         cout << "createIndex error, " << attributeName << " attribute name not unique" << endl;
+    }
+    if(ires == WRONG_TYPE){
+        cout << "createIndex error, wrong type" << endl;
+    }else if(ires == BPT_ALREADY_EXSIST){
+        cout << "createIndex error,index on " << attributeName << "already exist " << endl;
     }
 }
 

@@ -1,6 +1,7 @@
 #include "./index_manager.hpp"
 
-IndexManager::IndexManager() = default;
+IndexManager::IndexManager(BufferManager& _buffer_manager):
+                            buffer_manager(_buffer_manager){}
 
 IndexManager::~IndexManager() = default;
 
@@ -67,18 +68,18 @@ Result IndexManager::create_index(const string &table_name, const string &attrib
         int order = get_order(type);
         switch(type.get_type()){
             case CHAR:{
-                string_index[map_index] = make_shared<BPlusTree<char*>>(table_name, order, type.get_length());//index node
+                string_index[map_index] = make_shared<BPlusTree<char*>>(buffer_manager, table_name, order, type.get_length());//index node
                 string_index_start_block[map_index] = block_index;//start block(root)
                 string_index_len[map_index] = type.get_length();//string length
                 break;
             }
             case INT:{
-                int_index[map_index] = make_shared<BPlusTree<int>>(table_name, order, sizeof(int));
+                int_index[map_index] = make_shared<BPlusTree<int>>(buffer_manager, table_name, order, sizeof(int));
                 int_index_start_block[map_index] = block_index;
                 break;
             }
             case FLOAT:{
-                float_index[map_index] = make_shared<BPlusTree<float>>(table_name, order, sizeof(float));
+                float_index[map_index] = make_shared<BPlusTree<float>>(buffer_manager, table_name, order, sizeof(float));
                 float_index_start_block[map_index] = block_index;
                 break;
             }
