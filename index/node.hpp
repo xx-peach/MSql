@@ -147,16 +147,27 @@ Node<T>::Node(int order, block_t block_index, char* block_head, int size_of_type
 template <class T>
 int Node<T>::Search(T value){
     if(element_num<=0)return -1;//empty node, actually will not happen
-    if(element[0] > value) return -1;//not find
-    if(element[element_num-1] < value)return -(element_num+1);//not find
+    if constexpr (std::is_same<typename std::decay<T>::type, char*>::value){
+        if(strcmp(element[0],value)>0)return -1;
+        if(strcmp(element[element_num-1],value)<0)return -(element_num+1);
+    }else{
+        if(element[0] > value) return -1;//not find
+        if(element[element_num-1] < value)return -(element_num+1);//not find
+    }
     //else
     if(element_num > 0){//binary search
         int left=0, right = element_num-1, mid;
         while(left<=right){
             mid = (left + right) >> 1;
-            if(element[mid]==value)return mid;
-            else if(element[mid] < value) left = mid+1;
-            else right = mid-1;
+            if constexpr (std::is_same<typename std::decay<T>::type, char*>::value){
+                if(strcmp(element[mid],value)==0)return mid;
+                else if(strcmp(element[mid],value)<0)left = mid + 1;
+                else right = mid - 1;
+            }else{
+                if(element[mid]==value)return mid;
+                else if(element[mid] < value) left = mid+1;
+                else right = mid-1;
+            }
         }
         return -(left+1);//not find, need to insert at |here|-1 = left index
     }

@@ -1,1 +1,6 @@
+id2idx         t2             id2            0    0    
+ididx          t1             id             0    0    
 idx_name       employee       name           0    0    
+nameidx        employee       name           0    0    
+t1_id          t1             id             0    0    
+t2_id          t2             id             0    0    
