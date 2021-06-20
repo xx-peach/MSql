@@ -14,20 +14,20 @@ void IndexManager::new_file(string file_name){
 
 //get the order(n) of the b+ tree
 int IndexManager::get_order(FieldType type){
-    int order = 0;
-    switch(type.get_type()){
-        //max: (block_size - (is_leaf + num + parent_index + next_leaf_index)),left block_t and int or 2 block_t
-        case CHAR:{
-            order = (block_size - (sizeof(char) + sizeof(int) + sizeof(block_t)*2)) / (type.get_length() + sizeof(int)) -1 ;break;
-        }//one sizeof(int) for exception
-        case INT:{
-            order = (block_size - (sizeof(char) + sizeof(int) + sizeof(block_t)*2)) / (sizeof(int)*2) -1 ;break;
-        }
-        case FLOAT:{
-            order = (block_size - (sizeof(char) + sizeof(int) + sizeof(block_t)*2)) / (sizeof(float) + sizeof(int)) -1 ;;break;
-        }
-        default:;
-    }
+    int order = 10;
+    // switch(type.get_type()){
+    //     //max: (block_size - (is_leaf + num + parent_index + next_leaf_index)),left block_t and int or 2 block_t
+    //     case CHAR:{
+    //         order = (block_size - (sizeof(char) + sizeof(int) + sizeof(block_t)*2)) / (type.get_length() + sizeof(int)) -1 ;break;
+    //     }//one sizeof(int) for exception
+    //     case INT:{
+    //         order = (block_size - (sizeof(char) + sizeof(int) + sizeof(block_t)*2)) / (sizeof(int)*2) -1 ;break;
+    //     }
+    //     case FLOAT:{
+    //         order = (block_size - (sizeof(char) + sizeof(int) + sizeof(block_t)*2)) / (sizeof(float) + sizeof(int)) -1 ;;break;
+    //     }
+    //     default:;
+    // }
     return order;
 }
 
@@ -49,7 +49,7 @@ bool IndexManager::is_index_exist(string name, FieldType type){
 }
 
 
-//create index
+//create index, has called insert index to get a full b+ tree
 Result IndexManager::create_index(const string &table_name, const string &attribute_name, FieldType type){
     new_file(table_name);//table->file
     fiter file = index_getFile(table_name);
@@ -86,7 +86,10 @@ Result IndexManager::create_index(const string &table_name, const string &attrib
             default:
                 return WRONG_TYPE;
         }
-    }
+    }    
+    // }
+    // int i;
+    // insert_index(table_name,attribute_name,type,value,i);
     return SUCCESS;
 }
 
@@ -246,4 +249,39 @@ Result IndexManager::compare(const string &table_name, const string &attribute_n
         }
         default: return ERROR_CMP_VALUE;            //input error cmp value
     }
+}
+
+Result IndexManager::insert_index(const std::string &table_name, const string &attribute_name, FieldType type, const std::string &value, int block_index){
+    fiter file = index_getFile(table_name);
+    string map_index = table_name+"/"+attribute_name;
+    Result flag = SUCCESS;
+    char value_c[256];
+    strcpy(value_c, value.c_str());//ensure value_c not point to rubbish
+
+    if(!is_index_exist(map_index,type)){//not exist
+        flag = NO_INDEX;
+    }else{//exist
+        switch(type.get_type()){
+            case INT:   {   
+                if(! (int_index[map_index]->InsertElement(atoi(value.c_str()),block_index))){
+                    flag = INSERT_FAIL;
+                }
+                break;
+            }
+            case FLOAT:  {   
+                if(!(float_index[map_index]->InsertElement(atof(value.c_str()),block_index))){
+                    flag = INSERT_FAIL;
+                }
+                break;
+            }
+            case CHAR:  {   
+                if(!(string_index[map_index]->InsertElement(value_c,block_index))){
+                    flag = INSERT_FAIL;
+                }
+                break;
+            }
+            default: {return WRONG_TYPE;}
+        }
+    }
+    return flag;
 }

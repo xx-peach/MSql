@@ -42,8 +42,8 @@ private:
     biter GetBlockOffset(block_t index);
 
     //Error information
-    void InsertFail(int value){cout << "[ERROR]Insert value "<< value << " is already in the tree" <<endl;}
-    void DeleteFail(int value){cout << "[ERROR]Delete value "<< value << " doesn't exist in the tree" <<endl;}
+    void InsertFail(T value){cout << "[ERROR]Insert value "<< value << " is already in the tree" <<endl;}
+    void DeleteFail(T value){cout << "[ERROR]Delete value "<< value << " doesn't exist in the tree" <<endl;}
 
     //set the node empty and write it to buffer
     void SetEmptyBackToBuffer(std::shared_ptr<Node<T>> &node);
@@ -220,7 +220,7 @@ bool BPlusTree<T>::InsertElement(T value, int offset){
     SearchInNodeExe(root_node,value,res_node,insert_index);//search from root_node
     if(insert_index < 0){//not exist
         insert_index = -insert_index -1;
-        cout << "insert value = " << value << endl;
+        // cout << "insert value = " << value << endl;
         res_node->AddElementLeafNode(value,offset);//insert into leaf nodex
         WriteNodeBackToBuffer(res_node);//update node
         // cout << "here" << endl;
@@ -251,13 +251,13 @@ biter BPlusTree<T>::GetBlockOffset(block_t index){
 //splite node execution
 template<class T>
 void BPlusTree<T>::SpliteExe(std::shared_ptr<Node<T>>& node){
-    cout << "in splite exe" << endl;
+    // cout << "in splite exe" << endl;
     biter new_node_iter = buffer_manager.getFileBlock(this->table_name,1,size_of_type,1);
     block_t new_node_index = (*new_node_iter)->block_index;
     std::shared_ptr<Node<T>> new_node = std::make_shared<Node<T>>(this->order,new_node_index,node->is_leaf);//new node
     T min_value;
     node->Splite(min_value,new_node);//current level splite
-    cout << "min_value = " << min_value <<endl;
+    // cout << "min_value = " << min_value <<endl;
     // cout << "node->block_index" << node->block_index << endl;
     // node->OutputNode();
     WriteNodeBackToBuffer(node);//update orginal node to buffer
@@ -281,7 +281,7 @@ void BPlusTree<T>::SpliteExe(std::shared_ptr<Node<T>>& node){
         //original node's childs need not change, because the parent not change
     }
     if(node->parent_index == -1){// root node, need create new root node
-        cout << "splite new root" << endl;
+        // cout << "splite new root" << endl;
         biter new_root_iter = buffer_manager.getFileBlock(this->table_name, 1, size_of_type, 1);
         block_t new_root_index = (*new_root_iter)->block_index;
         // cout << "new_root_index = " << new_root_index << endl;
@@ -320,7 +320,7 @@ void BPlusTree<T>::SpliteExe(std::shared_ptr<Node<T>>& node){
 //remove an element from b+ tree
 template <class T>
 bool BPlusTree<T>::DeleteElement(T value){
-    cout << "delete value = " << value <<endl;
+    // cout << "delete value = " << value <<endl;
     //like insert, first find position to delete
     std::shared_ptr<Node<T>> root_node = NewNodePointer(root_index);
     int delete_index = -1;
@@ -430,7 +430,7 @@ bool BPlusTree<T>::UnionOrMoveExe(std::shared_ptr<Node<T>> node){
         cout << "[ERROR]Union 2 nodes can not be root." << endl;
         return false;
     }
-    cout << "union or move node:" <<endl;
+    // cout << "union or move node:" <<endl;
     node->OutputNode();
     block_t parent_index = node->parent_index;
     std::shared_ptr<Node<T>> parent_node = NewNodePointer(parent_index);

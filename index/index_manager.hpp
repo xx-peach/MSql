@@ -13,7 +13,7 @@ class IndexManager{
         IndexManager(BufferManager& buffer_manager);     // ctor
         ~IndexManager();    // dtor
         
-        //create index
+        //create index, has called insert index to get a full b+ tree
         Result create_index(const string &table_name, const string &attribute_name, FieldType type);
         
         //drop the index on the table
@@ -23,7 +23,7 @@ class IndexManager{
         Result find_element(const string &table_name, const string &attribute_name, FieldType type, char* value, std::vector<block_t> &block_index);
 
         //insert index
-        // Result insert_index(const std::string &table_name, const string &attribute_name, FieldType type, const std::string &data, int block_index);
+        Result insert_index(const std::string &table_name, const string &attribute_name, FieldType type, const std::string &data, int block_index);
 
         //cmp result
         Result compare(const string &table_name, const string &attribute_name, FieldType type, char* value, std::vector<block_t> &block_index, CMP cmp);
@@ -31,6 +31,27 @@ class IndexManager{
         //is the index on this type exist
         bool is_index_exist(string file_name, FieldType type);
         
+        //print the b+ tree for test
+        Result show_index(const std::string &table_name, const string &attribute_name, FieldType type){
+            Result result = SUCCESS;
+            string map_index = table_name+"/"+attribute_name;
+            if(is_index_exist(map_index,type)){
+                cout <<"order of tree = ";
+                if(type.get_type()==INT){
+                    cout << int_index[map_index]->order << endl;
+                    int_index[map_index]->LevelOrderOutput();
+                }else if(type.get_type()==FLOAT){
+                    cout << float_index[map_index]->order << endl;
+                    float_index[map_index]->LevelOrderOutput();
+                }else if(type.get_type()==CHAR){
+                    cout << string_index[map_index]->order << endl;
+                    string_index[map_index]->LevelOrderOutput();
+                }
+            }else{
+                result = NO_INDEX;
+            }
+            return result;
+        }
 
     private:
         BufferManager& buffer_manager;
