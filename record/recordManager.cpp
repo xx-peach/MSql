@@ -242,6 +242,20 @@ void RecordManager::selectWithoutIndex(string tableName, SelectCondition& condit
             tuples.erase(tuples.begin() + i);
 }
 
+/**
+ * @prototype: selectAttribute(string tableName, string attributeName, vector<Element> elements);
+ * @function: select all values of an attribute in a table
+ **/
+Result RecordManager::selectAttribute(string tableName, string attributeName, vector<Element>& elements) {
+    int attributeIndex = catalog_manager.get_attribute_index(tableName, attributeName);
+    Table table = catalog_manager.get_table(tableName);
+    for ( int i = 0; i < table.rowNum; i++ ) {
+        Tuple tmp = getTupleByRowNumber(table, i);
+        elements.push_back(tmp.getData()[i]);
+    }
+    return SUCCESS;
+}
+
 
 bool RecordManager::writeToBuffer(string tableName, int rowNum, char* data, int rowLength) {
     fiter file = buffer_manager.getFile(tableName, 0, rowLength, rowNum);

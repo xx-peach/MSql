@@ -42,6 +42,9 @@ public:
     /* Select on tuples without index */
     Result selectTupleWithoutIndex(const Table& table, const vector<SelectCondition>& selectConditions, vector<Tuple>& tuples);
 
+    /* Select all values of an attribute in a table */
+    Result selectAttribute(string tableName, string attributeName, vector<Element>& elements);
+
     /* middle interface that write to buffer */
     bool writeToBuffer(string tableName, int rowNum, char* data, int rowLength);
 
@@ -55,6 +58,7 @@ private:
     IndexManager& index_manager;
     BufferManager& buffer_manager;
     CatalogManager& catalog_manager;
+
     bool judgeCondition(string tableName, Tuple& tuple, SelectCondition& condition);
     bool isMatchTheAttribute(const Table& table, Tuple& tuple);
     bool isConflictTheUnique(const Table& table, Tuple& tuple);

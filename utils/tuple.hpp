@@ -66,7 +66,7 @@ public:
         cout << "index = " << index << ", data = ";
         for(int i=0; i<data.size(); i++){
             data[i].printElement();
-            cout << ", ";
+            cout << "(" << data[i].type << ")" << ", ";
         }
         cout << endl;
     }
