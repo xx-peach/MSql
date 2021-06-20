@@ -1,6 +1,20 @@
 employee name 6 3
-name           CHAR   10   1 
-age            INT    4    0 
-salary         FLOAT  4    0 
+name                                              CHAR      10        1 
+age                                               INT       4         0 
+salary                                            FLOAT     4         0 
 1
-idx_name       name           
+idx_name                                          name                                              
+minisql interpreter 0 6
+interpreter                                       CHAR      10        1 
+api                                               CHAR      10        0 
+record                                            INT       4         0 
+catalog                                           INT       4         0 
+index                                             FLOAT     4         0 
+buffer                                            FLOAT     4         1 
+1
+minisql_interpreter                               interpreter                                       
+students id 2 2
+id                                                INT       4         1 
+name                                              CHAR      10        0 
+1
+students_id                                       id                                                
