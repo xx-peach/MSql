@@ -250,15 +250,18 @@ void Interpreter::interpret(const string& s) {
     /*                interpret select statement                   */
     /***************************************************************/
     else if ( tokenList[i] == "select" || tokenList[i] == "SELECT" ) {
-        ++i;
-        if ( tokenList[i] != "*" ) {
-            throw MError(STAR_NOT_EXIST);
+        ++i; vector<string> selectAttrs;
+        while ( tokenList[i] != "from" && i != tokenList.size() ) {
+            selectAttrs.push_back(tokenList[i]);
+            ++i;
+        }
+        if ( i == tokenList.size() ) {
+            throw MError(FROM_NOT_EXIST);
             // cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
             // cout << "expecting '*'" << endl;
             // return;
         }
         else {
-            ++i;
             if ( tokenList[i] != "from" ) {
                 throw MError(FROM_NOT_EXIST);
                 // cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
@@ -305,7 +308,7 @@ void Interpreter::interpret(const string& s) {
                         } // end of for
                     } // end of else
                 }
-                api.selectTuple(tableName, conditions);
+                api.selectTuple(tableName, conditions, selectAttrs);
             }
         }
     }

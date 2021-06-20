@@ -44,12 +44,31 @@ void API::dropIndex(const string& indexName) {
     Result res = catalog_manager.dropIndex(indexName);
 }
 
-void API::selectTuple(const string& tableName, vector<SelectCondition>& selectConditions) const {
+void API::selectTuple(const string& tableName, vector<SelectCondition>& selectConditions, vector<string>& selectAttrs) const {
+    // cout << "tableName: " << tableName << endl;
+    // for ( int i = 0; i < selectConditions.size(); i++ ) {
+    //     cout << selectConditions[i].attributeName << endl;
+    // }
+    // for ( int i = 0; i < selectAttrs.size(); i++ ) {
+    //     cout << "project attribute " << i << ": " << selectAttrs[i] << endl;
+    // }
     vector<Tuple> res;
     Table table = catalog_manager.get_table(tableName);
     record_manager.selectTuple(table, selectConditions, res);
+    // select the specific attributes' indices for output
+    vector<int> attrIndexs;
+    int size = selectAttrs.size();
+    if ( size == 1 && selectAttrs[0] == "*" ) attrIndexs.push_back(-1);
+    else {
+        for ( int i = 0; i < size; i++ ) {
+            int idx = catalog_manager.get_attribute_index(tableName, selectAttrs[i]);
+            if ( idx == -1 ) throw MError(ATTRI_NAME_NOEXSIT);
+            else attrIndexs.push_back(idx);
+        }
+    }
+    // select the arrtibute name
     vector<string> titles = catalog_manager.get_titles(tableName);
-    ui.plotTable(res, titles);
+    ui.plotTable(res, titles, attrIndexs);
 }
 
 void API::insertTuple(const string& tableName, vector<pair<NumType, string>>& tupleString) {

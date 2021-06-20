@@ -19,7 +19,7 @@ public:
     UI();
     ~UI();
     string fetchStatement() const;
-    void plotTable(const vector<Tuple>&, const vector<string>&) const;
+    void plotTable(const vector<Tuple>&, const vector<string>&, const vector<int>&) const;
 };
 
 #endif

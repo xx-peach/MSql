@@ -31,7 +31,7 @@ string UI::fetchStatement() const {
 	return statement;
 }
 
-void UI::plotTable(const vector<Tuple>& tuples, const vector<string>& titles) const {
+void UI::plotTable(const vector<Tuple>& tuples, const vector<string>& titles, const vector<int>& attrIndexs) const {
 	// print the prompt of how many tuples selected
 	switch (tuples.size()) {
 		case 0:
@@ -45,18 +45,37 @@ void UI::plotTable(const vector<Tuple>& tuples, const vector<string>& titles) co
 			break;
 	}
 	// push the title into the printList
+	int size;
 	vector<vector<string>> printList;
-	printList.push_back(titles);
+	if ( attrIndexs[0] == -1 ) {
+		printList.push_back(titles);
+		size = titles.size();
+	}
+	else {
+		size = attrIndexs.size();
+		vector<string> tempTitles;
+		for ( int i = 0; i < size; i++ ) {
+			tempTitles.push_back(titles[attrIndexs[i]]);
+		}
+		printList.push_back(tempTitles);
+	}
 	// push all the data into the printList
 	for ( auto t : tuples ) {
 		vector<string> tempTuple;
-		for ( int i = 0; i < t.getData().size(); i++ ) {
-			tempTuple.push_back(t.getData()[i].elementToString());
+		if ( attrIndexs[0] == -1 ) {
+			for ( int i = 0; i < size; i++ ) {
+				tempTuple.push_back(t.getData()[i].elementToString());
+			}
+		}
+		else {
+			for ( int i = 0; i < size; i++ ) {
+				tempTuple.push_back(t.getData()[attrIndexs[i]].elementToString());
+			}
 		}
 		printList.push_back(tempTuple);
 	}
 	// find the max row length of each column
-	vector<int> maxLens(titles.size(), 0);
+	vector<int> maxLens(size, 0);
 	for ( auto i : printList ) {
 		for ( auto j = i.begin(); j != i.end(); ++j ) {
 			maxLens[j-i.begin()] = max(maxLens[j-i.begin()], int(j->length()));
