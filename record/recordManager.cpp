@@ -34,8 +34,8 @@ Result RecordManager::insertTuple(Table& table, Tuple& tuple) {
         return ERROR;
     }
     table.rowNum++;
-    catalog_manager.storeCatalog();
-    catalog_manager.initialCatalog();
+    // catalog_manager.storeCatalog();
+    // catalog_manager.initialCatalog();
     return SUCCESS;
 }
 

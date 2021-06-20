@@ -144,7 +144,7 @@ private:
                 file << tmpTable.attributeNum << endl;
 				for ( int i = 0; i < tmpTable.attributeNum; i++ ) {
 					Attribute tmpAttribute = tmpTable.attributeVector.at(i);
-					file << left << setw(15) << tmpAttribute.attributeName;
+					file << left << setw(50) << tmpAttribute.attributeName;
 					NumType temp_type = tmpAttribute.type.get_type();
 					string s;
 					switch(temp_type) {
@@ -158,15 +158,15 @@ private:
 						s = "FLOAT";
 						break;
 					}
-					file << left << setw(7) << s;
-					file << left << setw(5) << tmpAttribute.type.get_length();
+					file << left << setw(10) << s;
+					file << left << setw(10) << tmpAttribute.type.get_length();
 					file << setw(2) << tmpAttribute.isUnique << endl;
 				}
 				file << tmpTable.indexNum << endl;
 				for ( int i = 0; i < tmpTable.indexNum; i++ ) {
 					Index tmpIndex = tmpTable.indexVector.at(i);
-					file << left << setw(15) << tmpIndex.indexName;
-					file << left << setw(15) << tmpIndex.attributeName << endl;
+					file << left << setw(50) << tmpIndex.indexName;
+					file << left << setw(50) << tmpIndex.attributeName << endl;
 				}
 			}
 			file.close();
@@ -188,11 +188,11 @@ private:
 			Index tmpIndex;
 			for ( auto it : indexes ) {
 				tmpIndex = it.second;	
-				file << left << setw(15) << tmpIndex.indexName;
-				file << left << setw(15) << tmpIndex.tableName;
-				file << left << setw(15) << tmpIndex.attributeName;
-				file << left << setw(5) << tmpIndex.blockNum;
-				file << left << setw(5) << tmpIndex.rootNum << endl;
+				file << left << setw(50) << tmpIndex.indexName;
+				file << left << setw(50) << tmpIndex.tableName;
+				file << left << setw(50) << tmpIndex.attributeName;
+				file << left << setw(15) << tmpIndex.blockNum;
+				file << left << setw(15) << tmpIndex.rootNum << endl;
 			}
 			file.close();
 			return SUCCESS;
