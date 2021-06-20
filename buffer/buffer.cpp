@@ -228,6 +228,7 @@ biter BufferManager::getBlock( const fiter file ) {
         block_pool[used_block].block_index = (*file)->blockList.size(); // index start from 0
         block_pool[used_block].block_file = *file;
         (*file)->blockList.push_back( &block_pool[used_block] );
+        ++used_block;
         bit = --(*file)->blockList.end();
     }
     // if there are no free blocks left, then we must apply FIFO to replace a block

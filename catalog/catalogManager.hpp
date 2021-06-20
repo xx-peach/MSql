@@ -166,7 +166,6 @@ private:
 					file << left << setw(15) << tmpIndex.indexName;
 					file << left << setw(15) << tmpIndex.attributeName << endl;
 				}
-				cout << endl;
 			}
 			file.close();
 			return SUCCESS;

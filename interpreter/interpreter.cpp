@@ -118,7 +118,7 @@ void Interpreter::interpret(const string& s) {
     /*                interpret create statement                   */
     /***************************************************************/
     if ( tokenList[i] == "create" || tokenList[i] == "CREATE" ) {
-        ++i; bool flag = true;
+        ++i;
         /* create table statement */
         if ( tokenList[i] == "table" || tokenList[i] == "TABLE" ) {
             ++i;
@@ -188,18 +188,14 @@ void Interpreter::interpret(const string& s) {
                 // add the attribute into the attribute list
                 attributes.push_back(Attribute(attributeName, type, length, isUnique));
             }
-            // if there is an error, return directly
-            if ( !flag ) return;
             // get the primary key name
+            if ( i == tokenList.size() ) {
+                throw MError(PRIMARY_KEY_NOT_EXIST);
+                // cout << "Interpreter::interpret error, expecting primary key" << endl;
+            }
             else {
-                if ( i == tokenList.size() ) {
-                    throw MError(PRIMARY_KEY_NOT_EXIST);
-                    // cout << "Interpreter::interpret error, expecting primary key" << endl;
-                }
-                else {
-                    primaryKey = tokenList[i+2];
-                    api.createTable(tableName, attributes, primaryKey);
-                }
+                primaryKey = tokenList[i+2];
+                api.createTable(tableName, attributes, primaryKey);
             }
         }
         /* create index statement */
