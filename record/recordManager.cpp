@@ -251,7 +251,7 @@ Result RecordManager::selectAttribute(string tableName, string attributeName, ve
     Table table = catalog_manager.get_table(tableName);
     for ( int i = 0; i < table.rowNum; i++ ) {
         Tuple tmp = getTupleByRowNumber(table, i);
-        elements.push_back(tmp.getData()[i]);
+        elements.push_back(tmp.getData()[attributeIndex]);
     }
     return SUCCESS;
 }
