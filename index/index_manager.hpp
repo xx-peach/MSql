@@ -23,7 +23,10 @@ class IndexManager{
         Result find_element(const string &table_name, const string &attribute_name, FieldType type, char* value, std::vector<block_t> &block_index);
 
         //insert index
-        Result insert_index(const std::string &table_name, const string &attribute_name, FieldType type, const std::string &data, int block_index);
+        Result insert_index(const string &table_name, const string &attribute_name, FieldType type, const std::string &value, int offset);
+
+        //delete index
+        Result delete_index(const string &table_name, const string &attribute_name, FieldType type, const std::string &value);
 
         //cmp result
         Result compare(const string &table_name, const string &attribute_name, FieldType type, char* value, std::vector<block_t> &block_index, CMP cmp);

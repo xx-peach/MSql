@@ -251,7 +251,7 @@ Result IndexManager::compare(const string &table_name, const string &attribute_n
     }
 }
 
-Result IndexManager::insert_index(const std::string &table_name, const string &attribute_name, FieldType type, const std::string &value, int block_index){
+Result IndexManager::insert_index(const std::string &table_name, const string &attribute_name, FieldType type, const std::string &value, int offset){
     fiter file = index_getFile(table_name);
     string map_index = table_name+"/"+attribute_name;
     Result flag = SUCCESS;
@@ -263,20 +263,55 @@ Result IndexManager::insert_index(const std::string &table_name, const string &a
     }else{//exist
         switch(type.get_type()){
             case INT:   {   
-                if(! (int_index[map_index]->InsertElement(atoi(value.c_str()),block_index))){
+                if(! (int_index[map_index]->InsertElement(atoi(value.c_str()),offset))){
                     flag = INSERT_FAIL;
                 }
                 break;
             }
             case FLOAT:  {   
-                if(!(float_index[map_index]->InsertElement(atof(value.c_str()),block_index))){
+                if(!(float_index[map_index]->InsertElement(atof(value.c_str()),offset))){
                     flag = INSERT_FAIL;
                 }
                 break;
             }
             case CHAR:  {   
-                if(!(string_index[map_index]->InsertElement(value_c,block_index))){
+                if(!(string_index[map_index]->InsertElement(value_c,offset))){
                     flag = INSERT_FAIL;
+                }
+                break;
+            }
+            default: {return WRONG_TYPE;}
+        }
+    }
+    return flag;
+}
+
+Result IndexManager::delete_index(const string &table_name, const string &attribute_name, FieldType type, const std::string &value){
+    fiter file = index_getFile(table_name);
+    string map_index = table_name+"/"+attribute_name;
+    Result flag = SUCCESS;
+    char value_c[256];
+    strcpy(value_c, value.c_str());//ensure value_c not point to rubbish
+
+    if(!is_index_exist(map_index,type)){//not exist
+        flag = NO_INDEX;
+    }else{//exist
+        switch(type.get_type()){
+            case INT:   {   
+                if(! (int_index[map_index]->DeleteElement(atoi(value.c_str())))){
+                    flag = DELETE_FAIL;
+                }
+                break;
+            }
+            case FLOAT:  {   
+                if(!(float_index[map_index]->DeleteElement(atof(value.c_str())))){
+                    flag = DELETE_FAIL;
+                }
+                break;
+            }
+            case CHAR:  {   
+                if(!(string_index[map_index]->DeleteElement(value_c))){
+                    flag = DELETE_FAIL;
                 }
                 break;
             }

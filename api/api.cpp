@@ -36,12 +36,31 @@ void API::dropTable(const string& tableName) {
 
 void API::createIndex(const string& indexName, const string& tableName, const string& attributeName) {
     Result res1 = catalog_manager.createIndex(indexName, tableName, attributeName);
-    FieldType ft = catalog_manager.getTypeByIndexName(indexName);
-    Result res2 = index_manager.create_index(tableName,attributeName,ft);
+    FieldType type = catalog_manager.getTypeByIndexName(indexName);
+    Result res2 = index_manager.create_index(tableName,attributeName,type);
+    //insert all the tuples with indexs
+    vector<Element> elements;
+    string data;
+    int offset;
+    if(catalog_manager.is_unique(tableName,attributeName)){
+        record_manager.selectAttribute(tableName, attributeName, elements);
+        for(int i=0; i < elements.size(); i++){//all the elements
+            data= elements[i].elementToString();
+            offset = i/(block_size/(catalog_manager.get_row_length(tableName)));//get block_index
+            index_manager.insert_index(tableName,attributeName,type,data,offset);
+        }
+    }else{
+        cout << "create index error! attribute " + attributeName + " is not unique\n";
+    }
+    
 }
 
 void API::dropIndex(const string& indexName) {
+    string tableName = catalog_manager.getTableNameByIndexName(indexName);//in catalog drop
+    string attributeName =  catalog_manager.getAttrNameByIndexName(indexName);
+    FieldType type = catalog_manager.getTypeByIndexName(indexName);
     Result res = catalog_manager.dropIndex(indexName);
+    Result ires = index_manager.drop_index(tableName,attributeName,type);//in index drop
 }
 
 void API::selectTuple(const string& tableName, vector<SelectCondition>& selectConditions, vector<string>& selectAttrs) const {
