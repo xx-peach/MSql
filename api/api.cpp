@@ -27,11 +27,11 @@ vector<string> API::fetchFile(const string& fileName) const {
 }
 
 void API::createTable(const string& tableName, const vector<Attribute>& attributes, const string& primaryKey ) {
-    cout << "tableName: " << tableName << ", primary key: " << primaryKey << endl;
-    for ( int i = 0; i < attributes.size(); i++ ) {
-        cout << attributes[i].attributeName << ", " << attributes[i].type.get_type() << ", " << attributes[i].isUnique << endl;
-    }
-    // Result res = catalog_manager.createTable(tableName, primaryKey, attributes);
+    // cout << "tableName: " << tableName << ", primary key: " << primaryKey << endl;
+    // for ( int i = 0; i < attributes.size(); i++ ) {
+    //     cout << attributes[i].attributeName << ", " << attributes[i].type.get_type() << ", " << attributes[i].isUnique << endl;
+    // }
+    Result res = catalog_manager.createTable(tableName, primaryKey, attributes);
 }
 
 void API::dropTable(const string& tableName) {
