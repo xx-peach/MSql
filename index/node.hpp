@@ -50,7 +50,7 @@ public:
     void DeleteElement(int index);       
 
     void OutputNode(){//for test
-        cout << "|*";
+        cout << "index = " << this->block_index <<", |*";
         if(this->is_leaf){
             cout << this->offset[0] << "*|$ ";
             for(int i=0; i<element_num; i++){
@@ -66,6 +66,7 @@ public:
                 if(i < element_num-1)cout << "$ ";
             }
         }
+        cout << ", parent_index = " << this->parent_index << endl;
     }
 
     //for error information
@@ -108,11 +109,11 @@ Node<T>::Node(int order, block_t block_index, char* block_head, int size_of_type
     }  
     this->childs_index.push_back(-1);
 
-    if(block_head[0]==1){//first: is leaf
+    if(block_head[0]==1){//leaf:: is leaf : num : p_index : next_leaf_index : data0 : offset0 : data1 : offset1 : ...
         this->is_leaf = true;
         this->next_leaf_index = *((block_t *)(block_head+i));//leaf:next_leaf_index
         i += sizeof(block_t);
-    }else{//not leaf
+    }else{//not leaf::  is_leaf : num : p_index : child0 : data0 : child1 : data1 : child2 : ... 
         this->is_leaf = false;  
         this->next_leaf_index = -1;
         this->childs_index[0] = *(block_t*)(block_head + i);//not leaf:child[0]
@@ -138,7 +139,7 @@ Node<T>::Node(int order, block_t block_index, char* block_head, int size_of_type
             i += sizeof(int);
         }else{//not leaf://data|child|data|child|...
             this->childs_index[j+1] = *((block_t *)(block_head + i));   //store childs
-            i += sizeof(int);
+            i += sizeof(block_t);
         }
     }
 }
@@ -221,7 +222,7 @@ void Node<T>::AddElementLeafNode(T value, int offset){                          
         insert_index = - insert_index - 1;
         for(int i = this->element_num -1; i >= insert_index; i--){
             this->element[i+1] = element[i];
-            this->offset[i+1] = element[i];
+            this->offset[i+1] = this->offset[i];
         }
         this->element[insert_index] = value;
         this->offset[insert_index] = offset;

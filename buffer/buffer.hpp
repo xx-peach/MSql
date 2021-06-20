@@ -136,6 +136,11 @@ public:
     biter getBlockbyOffset( const fiter file, block_t index );
 
     /**
+     * @function: find a block in the file's block list, if not find, add it to the list
+     * @return: blocklist::iterator
+     **/
+    biter getBlockbyOffsetSave( const fiter file, block_t index );
+    /**
      * @function: find an available block in the pool to link to *file, if not find, then apply FIFO to replace a block
      * @return: blocklist::iterator
      **/
@@ -170,6 +175,9 @@ public:
      * @return: void
      **/
     void close();
+
+    //for test
+    void OutputBlockList(const fiter file);
 };
 
 #endif

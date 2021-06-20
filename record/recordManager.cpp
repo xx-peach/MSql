@@ -27,6 +27,7 @@ Result RecordManager::insertTuple(Table& table, Tuple& tuple) {
         return ERROR;
     }
     tupleToChar(tuple, tmpData);
+    cout << "tmpData = " << tmpData << endl;
     bool writeResult = writeToBuffer(table.tableName, table.rowNum, tmpData, table.rowLength);
     free(tmpData);
     if ( writeResult == false ) {

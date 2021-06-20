@@ -1,5 +1,5 @@
-#ifndef _BPLUS_TREE_HPP_
-#define _BPLUS_TREE_HPP_
+// #ifndef _BPLUS_TREE_HPP_
+// #define _BPLUS_TREE_HPP_
 #include <iostream>
 #include "node.hpp"
 using namespace std;
@@ -110,19 +110,23 @@ BPlusTree<T>::~BPlusTree() = default;
 //write the node information to buffer
 template <class T>
 void BPlusTree<T>::WriteNodeBackToBuffer(std::shared_ptr<Node<T>>& node){
-    if(node->element_num >= order){//update check for spliting
-        SpliteExe(node);
-    }
+    // if(node->element_num >= order){//update check for spliting
+    //     SpliteExe(node);
+    // }
+    // cout << "write back node's:" <<endl; node->OutputNode();
+    // cout << "test point1" << endl;
     biter temp = GetBlockOffset(node->block_index);//find the block in the file
+    // cout << "test point2" << endl;
     char* block_head = new char[block_size];
     int i = 0;
-    //order of the data in block:   is_leaf |   num |   p_index | data | offset/childs | ...
-    if(node->is_leaf)block_head[0] = 1;
-    else block_head[0] = -1;
+    //order of the data in block:   is_leaf |   num |   p_index | next_leaf/child0 | data | offset/childs | ...
+    if(node->is_leaf)*block_head = 1;
+    else *block_head = -1;
     i += sizeof(char);
     *((int*)(block_head+i)) = node->element_num;
     i += sizeof(int);
     *((block_t*)(block_head+i)) = node->parent_index;
+    // cout << "write back node's parent_index = " << node->parent_index << endl;
     i += sizeof(block_t);
     if(node->is_leaf){
         *((block_t*)(block_head+i)) = node->next_leaf_index;
@@ -132,17 +136,19 @@ void BPlusTree<T>::WriteNodeBackToBuffer(std::shared_ptr<Node<T>>& node){
         i += sizeof(block_t);
     }
     string st;
+    // cout << "test point3" << endl;
     //reverse process of node constructor function
     for(int j=0; j < node->element_num; j++){
         st = node->element[j];
         if  constexpr (std::is_same<typename std::decay<T>::type, char*>::value){//string
+            // cout << "test point3.1" << endl;
             memcpy(block_head + i,st.c_str(),size_of_type);//copy into block
             i += size_of_type;
         }else{//float or int
             *((T*)(block_head + i)) = node->element[j];
             i += sizeof(T);
         }
-
+        // cout << "test point4" << endl;
         if(node->is_leaf){//data|offset|data|offset|...
             *((int*)(block_head + i)) = node->offset[j];  //store offset
             i += sizeof(int);
@@ -151,7 +157,10 @@ void BPlusTree<T>::WriteNodeBackToBuffer(std::shared_ptr<Node<T>>& node){
             i += sizeof(block_t);
         }
     }
+    // cout << "test point5" << endl;
     (*temp)->writecover(block_head,i);
+    
+    // cout << "test point6" << endl;
     // (*temp)->data = block_head;//change the data in block(write back)
     // (*temp)->use_times ++;//use time ++ 
     // (*temp)->block_dirty_bit = 1;//use the block
@@ -211,10 +220,14 @@ bool BPlusTree<T>::InsertElement(T value, int offset){
     SearchInNodeExe(root_node,value,res_node,insert_index);//search from root_node
     if(insert_index < 0){//not exist
         insert_index = -insert_index -1;
-        res_node->AddElementLeafNode(value, offset);//insert into leaf node
+        cout << "insert value = " << value << endl;
+        res_node->AddElementLeafNode(value,offset);//insert into leaf nodex
         WriteNodeBackToBuffer(res_node);//update node
+        // cout << "here" << endl;
         if(res_node->element_num >= order){
+            // cout << "before splite" << endl;
             SpliteExe(res_node);//upward
+            // cout << "after splite" << endl;
         }
         return true;
     }else{//already exist
@@ -227,7 +240,9 @@ bool BPlusTree<T>::InsertElement(T value, int offset){
 template <class T>
 biter BPlusTree<T>::GetBlockOffset(block_t index){
     fiter file_temp = buffer_manager.getFile(this->table_name, 1, size_of_type, 1);//get the file
-    biter block_temp = buffer_manager.getBlockbyOffset(file_temp, index);//find the blockin the file
+    biter block_temp = buffer_manager.getBlockbyOffsetSave(file_temp, index);//find the blockin the file
+    // cout << "\n old index = " << index << ", new index = " << (*block_temp)->block_index << "\n";
+    // buffer_manager.OutputBlockList(file_temp);
     return block_temp;
 }
 
@@ -236,31 +251,40 @@ biter BPlusTree<T>::GetBlockOffset(block_t index){
 //splite node execution
 template<class T>
 void BPlusTree<T>::SpliteExe(std::shared_ptr<Node<T>>& node){
+    cout << "in splite exe" << endl;
     biter new_node_iter = buffer_manager.getFileBlock(this->table_name,1,size_of_type,1);
     block_t new_node_index = (*new_node_iter)->block_index;
     std::shared_ptr<Node<T>> new_node = std::make_shared<Node<T>>(this->order,new_node_index,node->is_leaf);//new node
     T min_value;
     node->Splite(min_value,new_node);//current level splite
+    cout << "min_value = " << min_value <<endl;
+    // cout << "node->block_index" << node->block_index << endl;
+    // node->OutputNode();
     WriteNodeBackToBuffer(node);//update orginal node to buffer
+    // cout << "judge" << endl;
     WriteNodeBackToBuffer(new_node);//update new node to buffer
-    
+    char * child_data;
     if(node->is_leaf == false){//not leaf
         block_t child_index;
-        biter new_node_iter;
-        char * child_data;
         for(int j=0; j< new_node->element_num + 1; j++){//update the childs to buffer
             child_index = new_node->childs_index[j];
-            if(child_index >= 0)child_data = GetBlockData(child_index);
-            else break;//illegal child node
+            // cout << "new_node's->child_index = " << child_index << endl;
             //copy sons:
             std::shared_ptr<Node<T>> child_node = NewNodePointer(child_index);
-            WriteNodeBackToBuffer(child_node);
+            child_node->parent_index = new_node->block_index;//update childs' parent
+            // cout << "child_node's->parent_index = " << child_node->parent_index << endl;
+            WriteNodeBackToBuffer(child_node);//write back is ok!
+            // child_node = NewNodePointer(child_index);
+            // // cout << "after write back, child_node:" << endl;//write back is ok!
+            // child_node->OutputNode();
         }
         //original node's childs need not change, because the parent not change
     }
-    if(node->parent_index == -1){// root node, need to create new root node
+    if(node->parent_index == -1){// root node, need create new root node
+        cout << "splite new root" << endl;
         biter new_root_iter = buffer_manager.getFileBlock(this->table_name, 1, size_of_type, 1);
         block_t new_root_index = (*new_root_iter)->block_index;
+        // cout << "new_root_index = " << new_root_index << endl;
         std::shared_ptr<Node<T>> new_root_node = std::make_shared<Node<T>>(order, new_root_index, false);
         //change root
         this->root_index = new_root_index;
@@ -270,6 +294,12 @@ void BPlusTree<T>::SpliteExe(std::shared_ptr<Node<T>>& node){
         new_root_node->element_num = 1;
         new_root_node->childs_index[0] = node->block_index;
         new_root_node->childs_index[1] = new_node->block_index;
+        // cout << "new_root_node index = " << new_root_node->block_index << ", ";
+        // new_root_node->OutputNode();cout << "\n";
+        // cout << "node: index = " << node->block_index << ", ";
+        // node->OutputNode();cout << "\n";
+        // cout << "new_node index = "<< new_node->block_index << ", ";
+        // new_node->OutputNode();cout << "\n";
         WriteNodeBackToBuffer(node);//update orginal node to buffer
         WriteNodeBackToBuffer(new_node);//update new node to buffer
         WriteNodeBackToBuffer(new_root_node);//update new root node to buffer
@@ -290,11 +320,14 @@ void BPlusTree<T>::SpliteExe(std::shared_ptr<Node<T>>& node){
 //remove an element from b+ tree
 template <class T>
 bool BPlusTree<T>::DeleteElement(T value){
+    cout << "delete value = " << value <<endl;
     //like insert, first find position to delete
     std::shared_ptr<Node<T>> root_node = NewNodePointer(root_index);
     int delete_index = -1;
     std::shared_ptr<Node<T>> res_node;//must be leaf node
     SearchInNodeExe(root_node,value,res_node,delete_index);
+    // cout << "delete res_node :" << endl;
+    // res_node->OutputNode();
     if(delete_index < 0){//not exist
         DeleteFail(value);
         return false;
@@ -307,6 +340,8 @@ bool BPlusTree<T>::DeleteElement(T value){
             if(delete_index == 0 && res_node->block_index != this->first_leaf_index){
                 block_t parent_index = res_node->parent_index;
                 std::shared_ptr<Node<T>> parent_node = NewNodePointer(parent_index);
+                // cout << "delete node's parent :" << endl;
+                // parent_node->OutputNode();
                 int upward_index = parent_node->Search(res_node->element[0]);//leftest value in res_node
                 while(upward_index <0){
                     if(parent_node->parent_index != -1){//not root
@@ -319,6 +354,7 @@ bool BPlusTree<T>::DeleteElement(T value){
                 WriteNodeBackToBuffer(parent_node);
                 res_node->DeleteElement(0);
             }else{
+                // cout << "directly delete\n";
                 res_node->DeleteElement(delete_index);
             }
             WriteNodeBackToBuffer(res_node);
@@ -332,7 +368,7 @@ bool BPlusTree<T>::DeleteElement(T value){
 template <class T>
 void BPlusTree<T>::Union(std::shared_ptr<Node<T>> node){
     if(UnionOrMoveExe(node)==true){//has been changed
-        LevelOrderOutput();
+        // LevelOrderOutput();
         block_t parent_index = node->parent_index;
         std::shared_ptr<Node<T>> parent_node = NewNodePointer(parent_index);
         if(parent_node->parent_index != -1){//not root
@@ -351,22 +387,40 @@ void BPlusTree<T>::Union(std::shared_ptr<Node<T>> node){
     }
 }
 
+#define STARTS "*************************************"
+
 template <class T>
 void BPlusTree<T>::LevelOrderOutput(){
+    cout << STARTS << "LEVEL ORDER" << STARTS << endl;
     queue<block_t> Q;
+    // cout << "root_index = " << this->root_index << endl;
+    if(this->root_index < 0){//empty tree
+        cout << "empty tree!" << endl;
+        return;
+    }
     Q.push(this->root_index);
-    block_t block_index;
-    std::shared_ptr<Node<T>> block_node;
+    block_t block_index, child_index;
+    std::shared_ptr<Node<T>> block_node ;//= NewNodePointer(root_index);
+    // block_node->OutputNode();
     while(!(Q.empty())){
         block_index = Q.front(); 
         Q.pop();
         block_node = NewNodePointer(block_index);
         block_node->OutputNode();
+        // if(block_node->is_leaf)cout << "is leaf" << endl;
+        // else cout << "not leaf" << endl;
         for(int i=0; i<=block_node->element_num; i++){
-            Q.push(block_node->childs_index[i]);
+            child_index = block_node->childs_index[i];
+            // cout << "child_index = " << child_index << ", ";
+            if(child_index < 0)break;//not more child
+            Q.push(child_index);
         }
+        // cout << "Qsize = "<<Q.size()<<endl;
+        cout << endl;
     }
+    cout << STARTS << "   END   " << STARTS << endl;
 }
+
 //union nodes or move elements when deleting elements
 //deleted node is used to store the information of deleted node
 //return true iff union is done, maybe some code can be reuse
@@ -376,6 +430,8 @@ bool BPlusTree<T>::UnionOrMoveExe(std::shared_ptr<Node<T>> node){
         cout << "[ERROR]Union 2 nodes can not be root." << endl;
         return false;
     }
+    cout << "union or move node:" <<endl;
+    node->OutputNode();
     block_t parent_index = node->parent_index;
     std::shared_ptr<Node<T>> parent_node = NewNodePointer(parent_index);
     std::shared_ptr<Node<T>> sibling_node;
@@ -409,8 +465,12 @@ bool BPlusTree<T>::UnionOrMoveExe(std::shared_ptr<Node<T>> node){
                 return false;//not union
             }
         }else{//childp_index > 0,union with left node, delete node
+            // cout << "parent node:" <<endl;
+            // parent_node->OutputNode();
             sibling_index = parent_node->childs_index[childp_index-1];
             sibling_node = NewNodePointer(sibling_index);
+            // cout << "sibling node:" <<endl;
+            // sibling_node->OutputNode();
             if(node->element_num + sibling_node->element_num <= order -1){
                 parent_node->DeleteElement(childp_index - 1);//index-1 for parent element
                 for(int i = 0; i < node->element_num; i++){//move
@@ -418,7 +478,7 @@ bool BPlusTree<T>::UnionOrMoveExe(std::shared_ptr<Node<T>> node){
                     sibling_node->offset[sibling_node->element_num + i] = node->offset[i];
                 }
                 sibling_node->element_num += node->element_num;
-                sibling_node->next_leaf_node = node->next_leaf_node;
+                sibling_node->next_leaf_index = node->next_leaf_index;
                 WriteNodeBackToBuffer(sibling_node);//update
                 WriteNodeBackToBuffer(parent_node);
                 SetEmptyBackToBuffer(node);//node empty
@@ -428,7 +488,7 @@ bool BPlusTree<T>::UnionOrMoveExe(std::shared_ptr<Node<T>> node){
                 int offset_tran =  sibling_node->offset[sibling_node->element_num-1];
                 node->AddElementLeafNode(element_tran, offset_tran);
                 sibling_node->DeleteElement(element_tran);
-                parent_node->Element[childp_index - 1] = node->element[0];
+                parent_node->element[childp_index - 1] = node->element[0];
                 WriteNodeBackToBuffer(node);
                 WriteNodeBackToBuffer(sibling_node);
                 WriteNodeBackToBuffer(parent_node);
@@ -579,4 +639,4 @@ void BPlusTree<T>::SetEmptyBackToBuffer(std::shared_ptr<Node<T>> &node){
  
 
 
-#endif
+// #endif

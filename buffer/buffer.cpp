@@ -103,7 +103,7 @@ bool Block::write( const char* d, int l ) {
  * @return: bool
  **/
 void Block::writecover( const char* d, int l ) {
-    memset(data, '\0', block_size);
+    memset(data, 0, block_size);
     byte_offset = 0;
     write(d, l);
 }
@@ -228,6 +228,7 @@ biter BufferManager::getBlock( const fiter file ) {
         block_pool[used_block].block_index = (*file)->blockList.size(); // index start from 0
         block_pool[used_block].block_file = *file;
         (*file)->blockList.push_back( &block_pool[used_block] );
+        ++used_block;
         bit = --(*file)->blockList.end();
     }
     // if there are no free blocks left, then we must apply FIFO to replace a block
@@ -273,10 +274,11 @@ biter BufferManager::getBlockbyOffset( const fiter file, block_t index ) {
     // if not find the erase block, then throw an error
     if ( flag ) return bit;
     else {
-        cout << "BufferManager::getBlockbyOffset error, block not exists";
+        cout << "BufferManager::getBlockbyOffset error, block not exists, create new one" << endl;
         return (*file)->blockList.end();
     }
 }
+
 
 /**
  * @prototype: getFileBlock( string name, file_t type, file_t len, block_t index );
@@ -377,4 +379,34 @@ void BufferManager::close() {
     for ( fit = fileList.begin(); fit != fileList.end(); ++fit ) {
         closeFile( fit );
     }
+}
+
+
+/**
+ * @function: find a block in the file's block list, if not find, add it to the list
+ * @return: blocklist::iterator
+ **/
+biter BufferManager::getBlockbyOffsetSave( const fiter file, block_t index ) {
+    biter bit;
+    bool flag = false;
+    // iterate through the list to find the erase block
+    for ( bit = (*file)->blockList.begin(); bit != (*file)->blockList.end(); bit++ ) {
+        if ( (*bit)->block_index == index ) { flag = true; break; }
+        else continue;
+    }
+    // if not find the erase block, then throw an error
+    if ( flag ) return bit;
+    else {
+        return  (getBlock(file));
+    }
+}
+
+//see the block list
+void BufferManager::OutputBlockList(const fiter file){
+    biter bit;
+    cout << endl << "block list:" << endl;
+    for ( bit = (*file)->blockList.begin(); bit != (*file)->blockList.end(); bit++ ) {
+        cout << (*bit)->block_index << ", ";
+    }
+    cout << endl;
 }

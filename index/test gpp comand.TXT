@@ -1,0 +1,1 @@
+g++ bplus_tree.cpp bplus_tree.hpp ..\buffer\buffer.cpp -o test.exe
