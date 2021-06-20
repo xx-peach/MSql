@@ -209,8 +209,8 @@ int RecordManager::deleteTuple(Table& table, vector<SelectCondition>& selectCond
         //
         // Delete tuple from file
         //
-        for ( int j = 0; j < attrIndex.size(); j++ )
-		    index_manager.delete_index(table.tableName, table.attributeVector[attrIndex[j]].attributeName, table.attributeVector[attrIndex[j]].type, tuple.getData()[attrIndex[j]].elementToString());
+        /*for ( int j = 0; j < attrIndex.size(); j++ )
+		    index_manager.deleteIndex(table.tableName, table.attributeVector[attrIndex[j]].attributeName, table.attributeVector[attrIndex[j]].type, tuple.getData()[attrIndex[j]].elementToString());*/
     }
     table.rowNum -= deleteNum;
     catalog_manager.storeCatalog();
@@ -226,9 +226,11 @@ vector<int> RecordManager::selectWithIndex(const Table& table, SelectCondition& 
     condition.fillAttributeIndex(table.tableName, catalog_manager);
     vector<int> idx;
     idx.clear();
-    char* con_value = (char*)malloc(condition.value.length * sizeof(char));
-    condition.value.elementToChar(con_value);
+    string value_str = condition.value.elementToString();
+    char* con_value = (char*)value_str.c_str();
+    cout << "value: " << con_value << endl;
     index_manager.compare(table.tableName, table.attributeVector[condition.attributeIndex].attributeName, table.attributeVector[condition.attributeIndex].type, con_value, idx, condition.conditionType);
+    cout << "size: " << idx.size() << endl;
     return idx;
 }
 
