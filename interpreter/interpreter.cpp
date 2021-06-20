@@ -28,11 +28,32 @@ Element Interpreter::getElement(string& s) {
         s = s.substr(1, s.size()-2);
         return Element(s);
     }
-    else if ( s.find_first_of("\"") != -1){
+    else if ( s.find_first_of("\"") != -1 ) {
         s = s.substr(1, s.size()-2);
         return Element(s);
-    }else {
+    }
+    else {
         return Element(atoi(s.c_str()));
+    }
+}
+
+
+/**
+ * @prototype: getElement(const string&);
+ * @function: construct an Element object from a given string
+ **/
+NumType Interpreter::getType(const string& s) {
+    if ( s.find_first_of(".") != -1 ) {
+        return FLOAT;
+    }
+    else if ( s.find_first_of("'") != -1 ) {
+        return CHAR;
+    }
+    else if ( s.find_first_of("\"") != -1) {
+        return CHAR;
+    }
+    else {
+        return INT;
     }
 }
 
@@ -40,19 +61,19 @@ Element Interpreter::getElement(string& s) {
  * @prototype: getElement(const string&);
  * @function: construct an Element object from a given string
  **/
-CMP Interpreter::getLogic(const string& s) {
-    if ( s == ">=" ) 
+CMP Interpreter::getLogic(const string& s1, const string& s2) {
+    if ( s1 == ">" && s2 == "=" ) 
         return GREATER_EQUAL;
-    else if ( s == "<=" )
+    else if ( s1 == "<" && s2 == "=" )
         return LESS_EQUAL;
-    else if ( s == "<>" )
+    else if ( s1 == "<" && s2 == ">" )
         return NOT_EQUAL;
-    else if ( s == ">" )
+    else if ( s1 == ">" && s2 != "=" && s2 != ">" && s2 != "<" )
         return GREATER;
-    else if ( s == "=" )
-        return EQUAL;
-    else if ( s == "<" )
+    else if ( s1 == "<" && s2 != "=" && s2 != ">" && s2 != "<" )
         return LESS;
+    else if ( s1 == "=" && s2 != "=" && s2 != ">" && s2 != "<" )
+        return EQUAL;
     else
         return ERROR_CMP;
 }
@@ -88,6 +109,7 @@ void Interpreter::interpret(const string& s) {
     for ( int i = 0; i < tokens.size(); i++ ) {
         string t = tempList[i]->getText();
         if ( isSpace(t) || t == "(" || t == "," || t == ")" || t == ";" || t == "<EOF>" ) continue;
+        // else if ( !t.size() || t == "" || t == "\0" ) continue;
         else tokenList.push_back(t);
     }
     /* signals */
@@ -96,7 +118,7 @@ void Interpreter::interpret(const string& s) {
     /*                interpret create statement                   */
     /***************************************************************/
     if ( tokenList[i] == "create" || tokenList[i] == "CREATE" ) {
-        ++i; bool flag = true;
+        ++i;
         /* create table statement */
         if ( tokenList[i] == "table" || tokenList[i] == "TABLE" ) {
             ++i;
@@ -112,9 +134,10 @@ void Interpreter::interpret(const string& s) {
                 bool isUnique = false;
                 string attributeName = tokenList[i];
                 if ( i+1 == tokenList.size() ) {
-                    cout << "Interpreter::interpret error, expecting attribute type {int, float, char}" << endl;
-                    flag = false;
-                    break;
+                    throw MError(ATTRIBUTE_ERROR);
+                    // cout << "Interpreter::interpret error, expecting attribute type {int, float, char}" << endl;
+                    // flag = false;
+                    // break;
                 }
                 string attributeType = tokenList[i+1];
                 // int type
@@ -134,23 +157,26 @@ void Interpreter::interpret(const string& s) {
                     if ( length > 0 ) ++i;
                     // char length error
                     else {
-                        cout << "Interpreter::interpret error, char length error" << endl;
-                        flag = false;
-                        break;
+                        throw MError(CHAR_LENGTH_ERROR);
+                        // cout << "Interpreter::interpret error, char length error" << endl;
+                        // flag = false;
+                        // break;
                     }
                 }
                 // error, no type information
                 else {
-                    cout << "Interpreter::interpret error, '" << attributeType << "' error, ";
-                    cout << "expecting attribute type {int, float, char}" << endl;
-                    flag = false;
-                    break;
+                    throw MError(ATTRIBUTE_ERROR);
+                    // cout << "Interpreter::interpret error, '" << attributeType << "' error, ";
+                    // cout << "expecting attribute type {int, float, char}" << endl;
+                    // flag = false;
+                    // break;
                 }
                 // check if there is 'unique' keyword
                 if ( i+2 == tokenList.size() ) {
-                    cout << "Interpreter::interpret error, expecting primary key" << endl;
-                    flag = false;
-                    break;
+                    throw MError(PRIMARY_KEY_NOT_EXIST);
+                    // cout << "Interpreter::interpret error, expecting primary key" << endl;
+                    // flag = false;
+                    // break;
                 }
                 else if ( tokenList[i+2] == "unique" ) {
                     isUnique = true;
@@ -162,15 +188,14 @@ void Interpreter::interpret(const string& s) {
                 // add the attribute into the attribute list
                 attributes.push_back(Attribute(attributeName, type, length, isUnique));
             }
-            // if there is an error, return directly
-            if ( !flag ) return;
             // get the primary key name
+            if ( i == tokenList.size() ) {
+                throw MError(PRIMARY_KEY_NOT_EXIST);
+                // cout << "Interpreter::interpret error, expecting primary key" << endl;
+            }
             else {
-                if ( i == tokenList.size() ) cout << "Interpreter::interpret error, expecting primary key" << endl;
-                else {
-                    primaryKey = tokenList[i+2];
-                    api.createTable(tableName, attributes, primaryKey);
-                }
+                primaryKey = tokenList[i+2];
+                api.createTable(tableName, attributes, primaryKey);
             }
         }
         /* create index statement */
@@ -180,8 +205,9 @@ void Interpreter::interpret(const string& s) {
             string indexName, tableName, attributeName;
             indexName = tokenList[i]; i++;
             if ( tokenList[i] != "on" ) {
-                cout << "Interpreter::interpret error, expecting 'on'" << endl;
-                return;
+                throw MError(ON_NOT_EXIST);
+                // cout << "Interpreter::interpret error, expecting 'on'" << endl;
+                // return;
             }
             else {
                 ++i; tableName = tokenList[i];
@@ -191,9 +217,10 @@ void Interpreter::interpret(const string& s) {
         }
         /* create statement error */
         else {
-            cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
-            cout << "expecting {table, index}" << endl;
-            return;
+            throw MError(EXPECTING_TABLE_OR_INDEX);
+            // cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
+            // cout << "expecting {table, index}" << endl;
+            // return;
         }
     }
     /*************************************************************/
@@ -213,9 +240,10 @@ void Interpreter::interpret(const string& s) {
         }
         /* drop statement error */
         else {
-            cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
-            cout << "expecting {table, index}" << endl;
-            return;
+            throw MError(EXPECTING_TABLE_OR_INDEX);
+            // cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
+            // cout << "expecting {table, index}" << endl;
+            // return;
         }
     }
     /***************************************************************/
@@ -224,16 +252,18 @@ void Interpreter::interpret(const string& s) {
     else if ( tokenList[i] == "select" || tokenList[i] == "SELECT" ) {
         ++i;
         if ( tokenList[i] != "*" ) {
-            cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
-            cout << "expecting '*'" << endl;
-            return;
+            throw MError(STAR_NOT_EXIST);
+            // cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
+            // cout << "expecting '*'" << endl;
+            // return;
         }
         else {
             ++i;
             if ( tokenList[i] != "from" ) {
-                cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
-                cout << "expecting 'from'" << endl;
-                return;
+                throw MError(FROM_NOT_EXIST);
+                // cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
+                // cout << "expecting 'from'" << endl;
+                // return;
             }
             else {
                 ++i; string tableName = tokenList[i];
@@ -241,20 +271,23 @@ void Interpreter::interpret(const string& s) {
                 ++i; vector<SelectCondition> conditions;
                 if ( i < tokenList.size() ) {
                     if ( tokenList[i] != "where" ) {
-                        cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
-                        cout << "expecting 'where'" << endl;
-                        return;
+                        throw MError(WHERE_NOT_EXIST);
+                        // cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
+                        // cout << "expecting 'where'" << endl;
+                        // return;
                     }
                     else {
                         for ( ; i < tokenList.size(); i++ ) {
                             // get attribute name
                             ++i; string attributeName = tokenList[i];
                             // get logic operator name
-                            ++i; CMP logicType = getLogic(tokenList[i]);
+                            ++i; CMP logicType = getLogic(tokenList[i], tokenList[i+1]);
+                            if ( logicType == GREATER_EQUAL || logicType == NOT_EQUAL || logicType == LESS_EQUAL ) ++i;
                             if ( logicType == ERROR_CMP ) {
-                                cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
-                                cout << "expecting {=, <>, <, <=, >, >=}" << endl;
-                                return;
+                                throw MError(LOGICTYPE_ERROR);
+                                // cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
+                                // cout << "expecting {=, <>, <, <=, >, >=}" << endl;
+                                // return;
                             }
                             // get the specified variable value
                             ++i; Element element = getElement(tokenList[i]);
@@ -262,9 +295,10 @@ void Interpreter::interpret(const string& s) {
                             // judge if there are more conditions
                             if ( i+1 < tokenList.size() ) {
                                 if ( tokenList[i+1] != "and" ) {
-                                    cout << "Interpreter::interpret error, '" << tokenList[i+1] << "' error, ";
-                                    cout << "expecting 'and'" << endl;
-                                    return;
+                                    throw MError(AND_NOT_EXIST);
+                                    // cout << "Interpreter::interpret error, '" << tokenList[i+1] << "' error, ";
+                                    // cout << "expecting 'and'" << endl;
+                                    // return;
                                 }
                                 else continue;
                             }
@@ -281,25 +315,28 @@ void Interpreter::interpret(const string& s) {
     else if ( tokenList[i] == "insert" || tokenList[i] == "INSERT" ) {
         ++i;
         if ( tokenList[i] != "into" ) {
-            cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
-            cout << "expecting 'into'" << endl;
-            return;
+            throw MError(INTO_NOT_EXIST);
+            // cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
+            // cout << "expecting 'into'" << endl;
+            // return;
         }
         else {
             ++i; string tableName = tokenList[i]; ++i;
             if ( tokenList[i] != "values" ) {
-                cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
-                cout << "expecting 'values'" << endl;
-                return;
+                throw MError(VALUES_NOT_EXIST);
+                // cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
+                // cout << "expecting 'values'" << endl;
+                // return;
             }
             else {
-                ++i; vector<Element> elements;
+                ++i; vector<pair<NumType, string>> tupleString;
                 for ( ; i < tokenList.size(); i++ ) {
-                    Element tmpElement = getElement(tokenList[i]);
-                    elements.push_back(tmpElement);
+                    // cout << "Type: " << getType(tokenList[i]);
+                    // cout << ", string: " << tokenList[i] << endl;
+                    tupleString.push_back(make_pair(getType(tokenList[i]), tokenList[i]));
                 }
-                Tuple tuple = Tuple(elements);
-                api.insertTuple(tableName, tuple);
+                // cout << "this" << endl;
+                api.insertTuple(tableName, tupleString);
             }
         }
     }
@@ -309,9 +346,10 @@ void Interpreter::interpret(const string& s) {
     else if ( tokenList[i] == "delete" || tokenList[i] == "DELETE" ) {
         ++i;
         if ( tokenList[i] != "from" ) {
-            cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
-            cout << "expecting 'from'" << endl;
-            return;
+            throw MError(FROM_NOT_EXIST);
+            // cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
+            // cout << "expecting 'from'" << endl;
+            // return;
         }
         else {
             // get the table name
@@ -320,20 +358,23 @@ void Interpreter::interpret(const string& s) {
             ++i; vector<SelectCondition> conditions;
             if ( i < tokenList.size() ) {
                 if ( tokenList[i] != "where" ) {
-                    cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
-                    cout << "expecting 'where'" << endl;
-                    return;
+                    throw MError(WHERE_NOT_EXIST);
+                    // cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
+                    // cout << "expecting 'where'" << endl;
+                    // return;
                 }
                 else {
                     for ( ; i < tokenList.size(); i++ ) {
                         // get attribute name
                         ++i; string attributeName = tokenList[i];
                         // get logic operator name
-                        ++i; CMP logicType = getLogic(tokenList[i]);
+                        ++i; CMP logicType = getLogic(tokenList[i], tokenList[i+1]);
+                        if ( logicType == GREATER_EQUAL || logicType == NOT_EQUAL || logicType == LESS_EQUAL ) ++i;
                         if ( logicType == ERROR_CMP ) {
-                            cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
-                            cout << "expecting {=, <>, <, <=, >, >=}" << endl;
-                            return;
+                            throw MError(LOGICTYPE_ERROR);
+                            // cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
+                            // cout << "expecting {=, <>, <, <=, >, >=}" << endl;
+                            // return;
                         }
                         // get the specified variable value
                         ++i; Element element = getElement(tokenList[i]);
@@ -341,9 +382,10 @@ void Interpreter::interpret(const string& s) {
                         // judge if there are more conditions
                         if ( i+1 < tokenList.size() ) {
                             if ( tokenList[i+1] != "and" ) {
-                                cout << "Interpreter::interpret error, '" << tokenList[i+1] << "' error, ";
-                                cout << "expecting 'and'" << endl;
-                                return;
+                                throw MError(AND_NOT_EXIST);
+                                // cout << "Interpreter::interpret error, '" << tokenList[i+1] << "' error, ";
+                                // cout << "expecting 'and'" << endl;
+                                // return;
                             }
                             else continue;
                         }
@@ -357,7 +399,8 @@ void Interpreter::interpret(const string& s) {
     /*                      wrong statement                        */
     /***************************************************************/
     else {
-        cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
-        cout << "expecting {create, drop, select, insert, delete}" << endl;
+        throw MError(STATEMENT_ERROR);
+        // cout << "Interpreter::interpret error, '" << tokenList[i] << "' error, ";
+        // cout << "expecting {create, drop, select, insert, delete}" << endl;
     }
 }

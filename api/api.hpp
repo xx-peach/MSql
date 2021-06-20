@@ -28,12 +28,13 @@ public:
     ~API();
 
     string fetchStatement() const;
+    vector<string> fetchFile(const string&) const;
     void createTable(const string&, const vector<Attribute>&, const string&);
     void dropTable(const string&);
     void createIndex(const string&, const string&, const string&);
     void dropIndex(const string&);
     void selectTuple(const string&, vector<SelectCondition>&) const;
-    void insertTuple(const string&, Tuple&);
+    void insertTuple(const string&, vector<pair<NumType, string>>&);
     void deleteTuple(const string&, vector<SelectCondition>&);
 };
 

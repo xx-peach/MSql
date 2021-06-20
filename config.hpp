@@ -26,6 +26,7 @@ static const size_t file_size = 100003;
 #define DB_FILES "../db_files/"
 #define CAT_TABLE DB_FILES "table/table.cat"
 #define CAT_INDEX DB_FILES "index/index.cat"
+#define TEST_DIR  DB_FILES "test/"
 #define TABLE_DIR DB_FILES "table/"
 #define TABLE_SUF ".tab"
 #define INDEX_DIR DB_FILES "index/"
@@ -63,6 +64,7 @@ enum Result {
     STATEMENT_ERROR = -23,
 
     // API
+    API_FILE_OPEN_FAIL = -41,
 
     // Record
     NO_SUCH_TABLE = -61,

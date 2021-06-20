@@ -39,14 +39,33 @@ int main() {
       // start the counting
       auto begin = chrono::system_clock::now();
       // exit the system via 'quit;' statement
-      if ( statement == "quit;" ) break;
-      // execute the statements
-      else {
-         interpreter.interpret(statement);
-         // output the total execution time
-         auto end = chrono::system_clock::now();
-         auto duration = chrono::duration_cast<chrono::microseconds>(end - begin);
-         cout << "finish execution in " << double(duration.count()) * chrono::microseconds::period::num / chrono::microseconds::period::den << " seconds" << endl;
+      if ( statement == "quit;" ) return 0;
+      // execute the statements      
+      else if (statement.find("execfile") == statement.npos) {
+         try {
+            interpreter.interpret(statement);
+         } catch(MError& e) {
+            e.diagnostic();
+         }
       }
+      else {
+			string word;
+			stringstream sstring(statement);
+			sstring >> word; sstring >> word;
+			auto instLists = api.fetchFile(string(word, 0, word.length()-1));
+         for ( auto i : instLists ) {
+            if ( i == "quit;" ) return 0;
+            try {
+               cout << i << endl;
+               interpreter.interpret(i);
+            } catch(MError& e) {
+               e.diagnostic();
+            }
+         }
+      }
+      // output the total execution time
+      auto end = chrono::system_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(end - begin);
+      cout << "finish execution in " << double(duration.count()) * chrono::microseconds::period::num / chrono::microseconds::period::den << " seconds" << endl;
    }
 }

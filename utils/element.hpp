@@ -34,6 +34,7 @@ public:
     Element(float f) {
         type = FLOAT;
         float_data = f;
+        int_data = (int)f;
         length = 4;
     }
     
@@ -41,6 +42,7 @@ public:
     Element(int i) {
         type = INT;
         int_data = i;
+        float_data = (float)i;
         length = 4;
     }
     
@@ -59,9 +61,11 @@ public:
     /* set the data of the current element */
     void setData(const int i) { 
         int_data = i;
+        float_data = (float)i;
     }
     void setData(const float f) {
         float_data = f;
+        int_data = (int)f;
     }
     void setData(const string& s) {
         char_data = s;

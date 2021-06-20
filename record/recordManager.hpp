@@ -34,7 +34,7 @@ public:
     int deleteTuple(Table& table, vector<SelectCondition>& selectConditions);
 
     /* Select with condition and index */
-    Result selectTuple(const Table& table, vector<SelectCondition>& selectConditions, vector<Tuple> tuples);
+    Result selectTuple(const Table& table, vector<SelectCondition>& selectConditions, vector<Tuple>& tuples);
 
     /* Select without condition */
     Result selectTuple(const Table& table, vector<Tuple>& tuples);
