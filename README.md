@@ -15,3 +15,9 @@ Since there will be specific path information inside the MakeFile(will causes er
   cd build
   make
   ./MSql
++ for debug:
+  ```c++
+  mkdir build && cd build
+  cmake -DCMAKE_BUILD_TYPE=Debug ..
+  make -j
+  ...... debug in vscode ......
