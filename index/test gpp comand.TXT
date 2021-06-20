@@ -1,1 +1,5 @@
+test:
 g++ bplus_tree.cpp bplus_tree.hpp ..\buffer\buffer.cpp -o test.exe
+
+index_test:
+g++ index_manager_test.cpp index_manager.cpp index_manager.hpp ..\buffer\buffer.cpp -o index_test.exe

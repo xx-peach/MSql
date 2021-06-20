@@ -33,7 +33,7 @@ public:
     void dropTable(const string&);
     void createIndex(const string&, const string&, const string&);
     void dropIndex(const string&);
-    void selectTuple(const string&, vector<SelectCondition>&) const;
+    void selectTuple(const string&, vector<SelectCondition>&, vector<string>&) const;
     void insertTuple(const string&, vector<pair<NumType, string>>&);
     void deleteTuple(const string&, vector<SelectCondition>&);
 };
