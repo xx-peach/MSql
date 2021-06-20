@@ -34,8 +34,6 @@ Result RecordManager::insertTuple(Table& table, Tuple& tuple) {
         return ERROR;
     }
     table.rowNum++;
-    // catalog_manager.storeCatalog();
-    // catalog_manager.initialCatalog();
     return SUCCESS;
 }
 
@@ -59,8 +57,6 @@ Result RecordManager::insertTuple(Table& table, vector<pair<NumType, string>>& t
         }
         if ( table.attributeVector[i].type.get_type() != tupleString[i].first ) {
             cout << "RecordManager::insertTuple error, tuple attributes do not match the table" << endl;
-            // cout << "getType: " << table.attributeVector[i].type.get_type() << "    ";
-            // cout << "first: " << tupleString[i].first << endl;
             return NO_SUCH_ATTR;
         }
         Element e;
@@ -213,8 +209,6 @@ int RecordManager::deleteTuple(Table& table, vector<SelectCondition>& selectCond
 		    index_manager.deleteIndex(table.tableName, table.attributeVector[attrIndex[j]].attributeName, table.attributeVector[attrIndex[j]].type, tuple.getData()[attrIndex[j]].elementToString());*/
     }
     table.rowNum -= deleteNum;
-    catalog_manager.storeCatalog();
-    catalog_manager.initialCatalog();
     return deleteNum;
 }
 

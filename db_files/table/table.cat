@@ -1,24 +1,4 @@
-<<<<<<< HEAD
-employee name 7 3
-name           CHAR   10   1 
-age            INT    4    0 
-salary         FLOAT  4    0 
-2
-idx_name       name           
-nameidx        name           
-t1 id 3 1
-id             INT    4    1 
-2
-t1_id          id             
-ididx          id             
-t2 id 3 2
-id             INT    4    1 
-id2            INT    4    1 
-2
-t2_id          id             
-id2idx         id2            
-=======
-employee name 6 3
+employee name 8 3
 name                                              CHAR      10        1 
 age                                               INT       4         0 
 salary                                            FLOAT     4         0 
@@ -38,4 +18,3 @@ id                                                INT       4         1
 name                                              CHAR      10        0 
 1
 students_id                                       id                                                
->>>>>>> fff8bd8ad98358c494e9c29d4445bdccd1af1f1a

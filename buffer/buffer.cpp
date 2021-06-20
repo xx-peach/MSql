@@ -306,7 +306,7 @@ void BufferManager::writeBack( Block block ) {
         string file_path;
         if ( !block.block_file->file_type ) file_path = TABLE_DIR + block.block_file->file_name + TABLE_SUF;
         else file_path = INDEX_DIR + block.block_file->file_name + INDEX_SUF;
-        ofstream outFile( file_path, ios::binary | ios::app );
+        fstream outFile( file_path, ios::binary | ios::out | ios::in );
         // write the modified block into the disk
         if ( outFile.is_open() ) {
             // find the position to write in
@@ -331,7 +331,7 @@ void BufferManager::writeBack( biter block ) {
         string file_path;
         if ( !(*block)->block_file->file_type ) file_path = TABLE_DIR + (*block)->block_file->file_name + TABLE_SUF;
         else file_path = INDEX_DIR + (*block)->block_file->file_name + INDEX_SUF;
-        ofstream outFile( file_path, ios::binary | ios::app );
+        fstream outFile( file_path, ios::binary | ios::out | ios::in );
         // write the modified block into the disk
         if ( outFile.is_open() ) {
             // find the position to write in
