@@ -10,7 +10,7 @@ int main() {
    UI ui;
    BufferManager buffer_manager;
    IndexManager index_manager(buffer_manager);
-   CatalogManager catalog_manager;
+   CatalogManager catalog_manager(buffer_manager);
    RecordManager record_manager(index_manager, buffer_manager, catalog_manager);
    API api(catalog_manager, record_manager, index_manager, ui);
    Interpreter interpreter(api);
@@ -61,7 +61,7 @@ int main() {
             for ( auto i : instLists ) {
                if ( i == "quit;" ) return 0;
                else {
-                  cout << i << endl;
+                  // cout << i << endl;
                   interpreter.interpret(i);
                }
             }

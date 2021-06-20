@@ -165,6 +165,12 @@ public:
     void setEmptyBlock(biter block);
 
     /**
+     * @function: remove a specific file in the fileList
+     * @return: void
+     **/
+    void removeFile( const fiter file );
+
+    /**
      * @function: close a file, destroy all the blocks in that file(write back at the same time)
      * @return: void
      **/

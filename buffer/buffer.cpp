@@ -180,10 +180,9 @@ fiter BufferManager::getFile( string name, file_t type, file_t len, file_t amoun
     if ( flag ) return fit;
     // can not find the file, then new a file pointer and add it to the list
     else {
-        // cout << "add a new file" << endl;
         FileTable* new_file = new FileTable( name, type, len, amount );
         fileList.push_back( new_file );
-        total_file++;
+        ++total_file;
         return --fileList.end();
     }
 }
@@ -206,6 +205,7 @@ void BufferManager::removeBlock( const fiter file, block_t index ) {
     // iterate through the list to find the erase block
     for ( bit = (*file)->blockList.begin(); bit != (*file)->blockList.end(); bit++ ) {
         if ( (*bit)->block_index == index ) {
+            setEmptyBlock(bit);
             (*file)->blockList.erase( bit );    // erase the block if find
             flag = true;                        // set flag on
             break;
@@ -225,9 +225,15 @@ biter BufferManager::getBlock( const fiter file ) {
     // if there are still free blocks in the block pool
     biter bit;
     if ( used_block < block_numb ) {
-        block_pool[used_block].block_index = (*file)->blockList.size(); // index start from 0
-        block_pool[used_block].block_file = *file;
-        (*file)->blockList.push_back( &block_pool[used_block] );
+        int tmpIdx = used_block;
+        while ( true ) {
+            if ( tmpIdx >= block_numb ) tmpIdx = 0;
+            if ( block_pool[tmpIdx].block_file == nullptr ) break;
+            else tmpIdx++;
+        }
+        block_pool[tmpIdx].block_index = (*file)->blockList.size(); // index start from 0
+        block_pool[tmpIdx].block_file = *file;
+        (*file)->blockList.push_back( &block_pool[tmpIdx] );
         ++used_block;
         bit = --(*file)->blockList.end();
     }
@@ -245,10 +251,7 @@ biter BufferManager::getBlock( const fiter file ) {
                 removeBlock( file, block_pool[idx].block_index );
                 // initialize the block
                 block_pool[idx].block_index = (*file)->blockList.size();
-                memset(block_pool[idx].data, '\0', block_size);
                 block_pool[idx].block_file = *file;
-                block_pool[idx].byte_offset = 0;
-                block_pool[idx].use_times = 0;
                 (*file)->blockList.push_back( &block_pool[used_block] );
                 bit = --(*file)->blockList.end();
             }
@@ -333,7 +336,6 @@ void BufferManager::writeBack( biter block ) {
         if ( outFile.is_open() ) {
             // find the position to write in
             int offset = block_size * (*block)->block_index;
-            cout << offset << endl;
             outFile.seekp( offset, ios::beg );
             outFile.write( (*block)->data, (*block)->byte_offset );
             outFile.close();
@@ -348,8 +350,24 @@ void BufferManager::writeBack( biter block ) {
  **/
 void BufferManager::setEmptyBlock(biter block){
     memset((*block)->data, '\0', block_size);
+    (*block)->block_file = nullptr;
+    (*block)->block_dirty_bit = 0;
     (*block)->byte_offset = 0;
-    (*block)->block_dirty_bit = 1;
+    (*block)->use_times = 0;
+}
+
+/**
+ * @function: remove a specific file in the fileList
+ * @return: void
+ **/
+void BufferManager::removeFile( const fiter file ) {
+    closeFile(file);
+    for ( fiter fit = fileList.begin(); fit != fileList.end(); ++fit ) {
+        if ( ((*fit)->file_name == (*file)->file_name) && ((*fit)->file_type == (*file)->file_type) ) {
+            fileList.erase(file);
+            break;
+        }
+    }
 }
 
 /**
@@ -361,7 +379,10 @@ void BufferManager::closeFile( fiter file ) {
     biter bit;
     for ( bit = (*file)->blockList.begin(); bit != (*file)->blockList.end(); bit++ ) {
         writeBack(bit);
+        setEmptyBlock(bit);
+        --used_block;
     }
+    --total_file;
 }
 
 /**

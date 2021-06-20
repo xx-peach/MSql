@@ -9,6 +9,7 @@
 #include "../utils/index.hpp"
 #include "../merror.hpp"
 #include "../index/index_manager.hpp"
+#include "../buffer/buffer.hpp"
 
 #include <fstream>
 #include <iomanip>
@@ -31,6 +32,7 @@ struct tableAttrName {
 
 class CatalogManager {
 private:
+	BufferManager& buffer_manager;
 	map<string, Table> tables;
 	map<string, Index> indexes;
 	map<string, string> table_attrToIndex;
@@ -198,7 +200,7 @@ private:
 	}
 	
 public:
-	CatalogManager() {
+	CatalogManager(BufferManager& _buffer_manager): buffer_manager(_buffer_manager) {
 		initialCatalog();
 	}
 
@@ -276,10 +278,15 @@ public:
 			// return TABLE_NAME_NOEXSIT;
 
 		Table& tmpTable = tables[tableName];
+		fiter tableFile = buffer_manager.getFile(tableName, 0, tmpTable.rowLength, tmpTable.rowNum);
+		fiter indexFile = buffer_manager.getFile(tableName, 1, tmpTable.rowLength, tmpTable.rowNum);
+		buffer_manager.removeFile(tableFile);
+		buffer_manager.removeFile(indexFile);
+
 		for ( int i = 0; i < tmpTable.indexVector.size(); i++ )
 			indexes.erase(tmpTable.indexVector[i].indexName);
 		tables.erase(tableName);
-		
+
 		string indexFileName = INDEX_DIR + tableName + INDEX_SUF;
 		string tableFileName = TABLE_DIR + tableName + TABLE_SUF;
 		remove(indexFileName.c_str());
@@ -336,6 +343,9 @@ public:
 		tmpTable.indexNum = tmpTable.indexVector.size();
 		indexes.erase(indexName);
 		table_attrToIndex.erase(tmpIndex.tableName + " " + tmpIndex.attributeName);
+
+		fiter indexFile = buffer_manager.getFile(indexName, 1, tmpTable.rowLength, tmpTable.rowNum);
+		buffer_manager.removeFile(indexFile);
 
 		string indexFileName = INDEX_DIR + indexName + INDEX_SUF;
 		remove(indexFileName.c_str());

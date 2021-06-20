@@ -437,8 +437,8 @@ bool BPlusTree<T>::UnionOrMoveExe(std::shared_ptr<Node<T>> node){
     std::shared_ptr<Node<T>> sibling_node;
     block_t sibling_index;
     block_t child_index;
-    int judge_index = parent_node->Search(node->element[0]);//to judge merge left or right, see node is which son?
-    int childp_index = (judge_index < 0) ? -(judge_index+1) : judge_index +1;
+    block_t judge_index = parent_node->Search(node->element[0]);//to judge merge left or right, see node is which son?
+    block_t childp_index = (judge_index < 0) ? -(judge_index+1) : judge_index +1;
     if(node->is_leaf){//leaf node
         if(childp_index == 0){//node is the first son of parent, merge right!
             sibling_index = parent_node->childs_index[1];
@@ -484,10 +484,14 @@ bool BPlusTree<T>::UnionOrMoveExe(std::shared_ptr<Node<T>> node){
                 SetEmptyBackToBuffer(node);//node empty
                 return true;
             }else{//move 1 element from left to right
-                int element_tran = sibling_node->element[sibling_node->element_num-1];
-                int offset_tran =  sibling_node->offset[sibling_node->element_num-1];
-                node->AddElementLeafNode(element_tran, offset_tran);
-                sibling_node->DeleteElement(element_tran);
+                for(int i = node->element_num-1; i>=0; i--){
+                    node->element[i+1]= node->element[i];
+                    node->offset[i+1] = node->offset[i];
+                }
+                node->element[0] = sibling_node->element[sibling_node->element_num-1];
+                node->offset[0] = sibling_node->offset[sibling_node->element_num-1];
+                node->element_num++;
+                sibling_node->element_num--;
                 parent_node->element[childp_index - 1] = node->element[0];
                 WriteNodeBackToBuffer(node);
                 WriteNodeBackToBuffer(sibling_node);

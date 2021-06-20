@@ -4,11 +4,3 @@ age            INT    4    0
 salary         FLOAT  4    0 
 1
 idx_name       name           
-students id 1001 5
-id             CHAR   10   1 
-name           CHAR   40   0 
-credit         INT    4    0 
-score          INT    4    0 
-dept_name      CHAR   40   0 
-1
-students_id    id             
