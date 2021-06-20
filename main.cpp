@@ -60,7 +60,10 @@ int main() {
          try {
             for ( auto i : instLists ) {
                if ( i == "quit;" ) return 0;
-               else interpreter.interpret(i);
+               else {
+                  cout << i << endl;
+                  interpreter.interpret(i);
+               }
             }
             // output the total execution time
             auto end = chrono::system_clock::now();

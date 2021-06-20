@@ -303,12 +303,9 @@ void BufferManager::writeBack( Block block ) {
         string file_path;
         if ( !block.block_file->file_type ) file_path = TABLE_DIR + block.block_file->file_name + TABLE_SUF;
         else file_path = INDEX_DIR + block.block_file->file_name + INDEX_SUF;
-        ofstream outFile( file_path, ios::binary | ios::out );
+        ofstream outFile( file_path, ios::binary | ios::app );
         // write the modified block into the disk
         if ( outFile.is_open() ) {
-            // get the file size
-            outFile.seekp( 0, ios::end );
-            streampos file_size = outFile.tellp();
             // find the position to write in
             int offset = block_size * block.block_index;
             outFile.seekp( offset, ios::beg );
@@ -331,14 +328,12 @@ void BufferManager::writeBack( biter block ) {
         string file_path;
         if ( !(*block)->block_file->file_type ) file_path = TABLE_DIR + (*block)->block_file->file_name + TABLE_SUF;
         else file_path = INDEX_DIR + (*block)->block_file->file_name + INDEX_SUF;
-        ofstream outFile( file_path, ios::binary | ios::out );
+        ofstream outFile( file_path, ios::binary | ios::app );
         // write the modified block into the disk
         if ( outFile.is_open() ) {
-            // get the file size
-            outFile.seekp( 0, ios::end );
-            streampos file_size = outFile.tellp();
             // find the position to write in
             int offset = block_size * (*block)->block_index;
+            cout << offset << endl;
             outFile.seekp( offset, ios::beg );
             outFile.write( (*block)->data, (*block)->byte_offset );
             outFile.close();
@@ -346,6 +341,7 @@ void BufferManager::writeBack( biter block ) {
         else cout << "BufferManager::writeBack error, " << (*block)->block_file->file_name << " not find";
     }
 }
+
 /**
  * @function: set block empty
  * @return: void
@@ -363,9 +359,8 @@ void BufferManager::setEmptyBlock(biter block){
  **/
 void BufferManager::closeFile( fiter file ) {
     biter bit;
-    // iterate through the blockList of the file to write back
     for ( bit = (*file)->blockList.begin(); bit != (*file)->blockList.end(); bit++ ) {
-        writeBack( bit );
+        writeBack(bit);
     }
 }
 
@@ -377,10 +372,9 @@ void BufferManager::closeFile( fiter file ) {
 void BufferManager::close() {
     fiter fit;
     for ( fit = fileList.begin(); fit != fileList.end(); ++fit ) {
-        closeFile( fit );
+        closeFile(fit);
     }
 }
-
 
 /**
  * @function: find a block in the file's block list, if not find, add it to the list
