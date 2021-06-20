@@ -26,7 +26,7 @@ Result RecordManager::insertTuple(Table& table, Tuple& tuple) {
         return ERROR;
     }
     tupleToChar(tuple, tmpData);
-    cout << "tmpData = " << tmpData << endl;
+    // cout << "tmpData = " << tmpData << endl;
     bool writeResult = writeToBuffer(table.tableName, table.rowNum, tmpData, table.rowLength);
     free(tmpData);
     if ( writeResult == false ) {
@@ -259,24 +259,31 @@ Result RecordManager::selectAttribute(string tableName, string attributeName, ve
 
 bool RecordManager::writeToBuffer(string tableName, int rowNum, char* data, int rowLength) {
     fiter file = buffer_manager.getFile(tableName, 0, rowLength, rowNum);
-    int block_num = buffer_manager.getBlockNums(file);
     int idx = rowNum / (block_size / rowLength);
     biter block;
-    if ( block_num > idx ) {
-        block = buffer_manager.getBlockbyOffset(file, idx);
-        if ( block_size - (*block)->byte_offset >= rowLength )
-            return (*block)->write(data, rowLength);
-        char* blank = (char*)malloc((block_size - (*block)->byte_offset) * sizeof(char));
+    while ( buffer_manager.getBlockNums(file) <= idx ) {
+        block = buffer_manager.getBlock(file);
+        (*block)->read();
+    }
+    block = buffer_manager.getBlockbyOffset(file, idx);
+    if ( (*block)->byte_offset == 0 && idx > 0 ) {
+        biter full_block = buffer_manager.getBlockbyOffset(file, idx-1);
+        char* blank = (char*)malloc((block_size - (*full_block)->byte_offset) * sizeof(char));
         if ( blank == NULL ) {
             cout << "RecordManager::writeToBuffer error, memory used up" << endl;
             return false;
         }
-        memset(blank, 0, block_size - (*block)->byte_offset);
-        if ( !(*block)->write(blank, block_size - (*block)->byte_offset) )
+        memset(blank, 0, block_size - (*full_block)->byte_offset);
+        if ( !(*full_block)->write(blank, block_size - (*full_block)->byte_offset) ) {
+            // cout << "here: " << block_size - (*full_block)->byte_offset << endl;
             return false;
+        }
+        free(blank);
     }
-    biter new_block = buffer_manager.getBlock(file);
-    return (*new_block)->write(data, rowLength);
+    if ( block_size - (*block)->byte_offset >= rowLength )
+        return (*block)->write(data, rowLength);
+    else
+        return false;
 }
 
 bool RecordManager::readFromBuffer(string tableName, int rowNum, char* data, int rowLength) {
@@ -288,7 +295,7 @@ bool RecordManager::readFromBuffer(string tableName, int rowNum, char* data, int
     }
     int offset = rowNum % (block_size / rowLength);
     biter block = buffer_manager.getBlockbyOffset(file, idx);
-    memmove(data, &((*block)->data[rowNum*rowLength]), rowLength);
+    memmove(data, &((*block)->data[offset*rowLength]), rowLength);
     return true;
 }
 
