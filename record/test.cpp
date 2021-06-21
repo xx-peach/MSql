@@ -8,7 +8,7 @@ int main()
 {
     BufferManager buffer_manager;
     IndexManager index_manager(buffer_manager);
-    CatalogManager catalog_manager;
+    CatalogManager catalog_manager(buffer_manager);
     RecordManager record_manager(index_manager, buffer_manager, catalog_manager);
     if(catalog_manager.initialCatalog())
         cout << "Initialize error!" << endl;

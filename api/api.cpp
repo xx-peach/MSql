@@ -127,6 +127,6 @@ void API::insertTuple(const string& tableName, vector<pair<NumType, string>>& tu
 
 void API::deleteTuple(const string& tableName, vector<SelectCondition>& selectConditions) {
     // cout << "API::deleteTuple()" << endl;
-    // Table table = catalog_manager.get_table(tableName);
-    // record_manager.deleteTuple(table, selectConditions);
+    Table table = catalog_manager.get_table(tableName);
+    record_manager.deleteTuple(table, selectConditions);
 }

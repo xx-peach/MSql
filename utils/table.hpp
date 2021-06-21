@@ -26,7 +26,7 @@ public:
 		this->attributeNum = _attributeVector.size();
 		this->attributeVector = _attributeVector;
 		this->primaryKey = _primaryKey;
-		this->rowLength = sizeof(int); 				// Row index of tuple, has nothing to do with Index.hpp
+		this->rowLength = sizeof(char) + sizeof(int);
 		this->tableName = _tableName;
 		this->indexNum = 0;
 		this->rowNum = 0;
@@ -45,7 +45,7 @@ public:
 		this->indexNum = _indexVector.size();
 		this->indexVector = _indexVector;
 		this->primaryKey = _primaryKey;
-		this->rowLength = sizeof(int); 				// Row index of tuple, has nothing to do with Index.hpp
+		this->rowLength = sizeof(char) + sizeof(int);
 		this->tableName = _tableName;
 		this->rowNum = _rowNum;
 		for ( int i = 0; i < _attributeVector.size(); i++ ) {

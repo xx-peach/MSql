@@ -8,22 +8,27 @@
 class Tuple {
 private:
     int index;                  // Row index, has nothing to do with Index.hpp
-    vector<Element> data;       // a tuple is consist of a vector of element objects
+    vector<Element> data;       // A tuple consists of a vector of element objects
+    bool is_deleted;            // Whether the tuple is deleted
 
 public:
     /* default constructor */
-    Tuple() {}
+    Tuple() {
+        is_deleted = false;
+    }
 
     /* potential constructor */
     Tuple(const int elementNum) {
         Tuple();
         data.resize(elementNum);
+        is_deleted = false;
     }
 
     /* copy constructor */
     Tuple(const Tuple& t) {
         index = t.index;
         data = t.data;
+        is_deleted = t.is_deleted;
     }
 
     /* constructor by a vector of element objects */
@@ -62,9 +67,17 @@ public:
         index = i;
     }
 
+    bool isDeleted() {
+        return is_deleted;
+    }
+
+    void setDeleted(bool status) {
+        is_deleted = status;
+    }
+
     void outputTuple(){
         cout << "index = " << index << ", data = ";
-        for(int i=0; i<data.size(); i++){
+        for(int i = 0; i < data.size(); i++){
             data[i].printElement();
             cout << "(" << data[i].type << ")" << ", ";
         }

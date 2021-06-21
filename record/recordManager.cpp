@@ -27,7 +27,7 @@ Result RecordManager::insertTuple(Table& table, Tuple& tuple) {
     }
     tupleToChar(tuple, tmpData);
     // cout << "tmpData = " << tmpData << endl;
-    bool writeResult = writeToBuffer(table.tableName, table.rowNum, tmpData, table.rowLength);
+    bool writeResult = writeToBuffer(table.tableName, table.rowNum, tmpData, table.rowLength, false);
     free(tmpData);
     if ( writeResult == false ) {
         cout << "RecordManager::insertTuple error, write to buffer fail" << endl;
@@ -80,6 +80,8 @@ Result RecordManager::insertTuple(Table& table, vector<pair<NumType, string>>& t
 Result RecordManager::selectTuple(const Table& table, vector<Tuple>& tuples) {
     for ( int i = 0; i < table.rowNum; i++ ) {
         Tuple tmp = getTupleByRowNumber(table, i);
+        if ( tmp.isDeleted() )
+            continue;
         tuples.push_back(tmp);
     }
     return SUCCESS;
@@ -92,6 +94,8 @@ Result RecordManager::selectTuple(const Table& table, vector<Tuple>& tuples) {
 Result RecordManager::selectTupleWithoutIndex(const Table& table, const vector<SelectCondition>& selectConditions, vector<Tuple>& tuples) {
     for ( int i = 0; i < table.rowNum; i++ ) {
         Tuple tmp = getTupleByRowNumber(table, i);
+        if ( tmp.isDeleted() )
+            continue;
         bool valid = true;
         for ( auto it : selectConditions ) {
             if ( judgeCondition(table.tableName, tmp, it) == false ) {
@@ -147,6 +151,8 @@ Result RecordManager::selectTuple(const Table& table, vector<SelectCondition>& s
     else {
         for ( int i = 0; i < idx.size(); i++ ) {
             Tuple tmp = getTupleByRowNumber(table, idx[i]);
+            if ( tmp.isDeleted() )
+                continue;
             tuples.push_back(tmp);
         }
     }
@@ -170,7 +176,7 @@ int RecordManager::deleteTuple(Table& table, vector<SelectCondition>& selectCond
         return ERROR;
     }
     if ( searchResult.size() == 0 ) {
-        cout << "no tuple satisfies the condition" << endl;
+        cout << "No tuple satisfies the condition" << endl;
         return 0;
     }
     vector<int> attrIndex;
@@ -184,11 +190,30 @@ int RecordManager::deleteTuple(Table& table, vector<SelectCondition>& selectCond
     int deleteNum = searchResult.size();
     for ( int i = 0; i < deleteNum; i++ ) {
         Tuple tuple = searchResult[i];
-        //
-        // Delete tuple from file
-        //
-        /*for ( int j = 0; j < attrIndex.size(); j++ )
-		    index_manager.deleteIndex(table.tableName, table.attributeVector[attrIndex[j]].attributeName, table.attributeVector[attrIndex[j]].type, tuple.getData()[attrIndex[j]].elementToString());*/
+        if ( tuple.isDeleted() ) {
+            cout << "The tuple is already deleted." << endl;
+            continue;
+        }
+        char* tmpData = (char*)malloc(table.rowLength * sizeof(char));
+        if ( tmpData == NULL ) {
+            cout << "RecordManager::insertTuple error, memory used up" << endl;
+            return ERROR;
+        }
+        readFromBuffer(table.tableName, tuple.getIndex(), tmpData, table.rowLength);
+        if ( tmpData[0] == '0' ) {
+            cout << "The tuple is already deleted." << endl;
+            free(tmpData);
+            continue;
+        }
+        tmpData[0] = '0';
+        bool writeResult = writeToBuffer(table.tableName, tuple.getIndex(), tmpData, table.rowLength, true);
+        free(tmpData);
+        if ( writeResult == false ) {
+            cout << "RecordManager::deleteTuple error, write to buffer fail" << endl;
+            return -1;
+        }
+        for ( int j = 0; j < attrIndex.size(); j++ )
+		    index_manager.delete_index(table.tableName, table.attributeVector[attrIndex[j]].attributeName, table.attributeVector[attrIndex[j]].type, tuple.getData()[attrIndex[j]].elementToString());
     }
     table.rowNum -= deleteNum;
     return deleteNum;
@@ -229,15 +254,18 @@ Result RecordManager::selectAttribute(string tableName, string attributeName, ve
     Table table = catalog_manager.get_table(tableName);
     for ( int i = 0; i < table.rowNum; i++ ) {
         Tuple tmp = getTupleByRowNumber(table, i);
+        if ( tmp.isDeleted() )
+            continue;
         elements.push_back(tmp.getData()[attributeIndex]);
     }
     return SUCCESS;
 }
 
 
-bool RecordManager::writeToBuffer(string tableName, int rowNum, char* data, int rowLength) {
+bool RecordManager::writeToBuffer(string tableName, int rowNum, char* data, int rowLength, bool isDelete) {
     fiter file = buffer_manager.getFile(tableName, 0, rowLength, rowNum);
     int idx = rowNum / (block_size / rowLength);
+    int offset = rowNum % (block_size / rowLength);
     biter block;
     while ( buffer_manager.getBlockNums(file) <= idx ) {
         block = buffer_manager.getBlock(file);
@@ -258,10 +286,12 @@ bool RecordManager::writeToBuffer(string tableName, int rowNum, char* data, int 
         }
         free(blank);
     }
-    if ( block_size - (*block)->byte_offset >= rowLength )
-        return (*block)->write(data, rowLength);
+    if ( isDelete ) {
+        memmove(&((*block)->data[offset*rowLength]), data, rowLength);
+        return true;;
+    }
     else
-        return false;
+        return (*block)->write(data, rowLength);
 }
 
 bool RecordManager::readFromBuffer(string tableName, int rowNum, char* data, int rowLength) {
@@ -290,6 +320,8 @@ void RecordManager::printTable(const Table& table) {
     // cout << table.rowNum << endl;
     for(int i = 0; i < table.rowNum; i++) {
         Tuple tuple = getTupleByRowNumber(table, i);
+        if ( tuple.isDeleted() )
+            continue;
         for (int j = 0; j < tuple.getData().size(); j++) {
             tuple.getData()[j].printElement();
             cout << "\t";
@@ -329,6 +361,8 @@ bool RecordManager::isConflictTheUnique(const Table& table, Tuple& tuple) {
         } else { // Iteration without index
             for(int j = 0; j < table.rowNum; j++){
                 Tuple tmpTuple = getTupleByRowNumber(table, j);
+                if ( tmpTuple.isDeleted() )
+                    continue;
                 if (tmpTuple.getData()[i] == tuple.getData()[i])
                     return true;
              }
@@ -351,6 +385,8 @@ Tuple RecordManager::getTupleByRowNumber(const Table& table, int rowNumber) {
 }
 
 bool RecordManager::judgeCondition(string tableName, Tuple& tuple, SelectCondition& condition) {
+    if ( tuple.isDeleted() )
+        return false;
     condition.fillAttributeIndex(tableName, catalog_manager);
     if ( condition.conditionType == LESS ) {
         if ( tuple.getData()[condition.attributeIndex] < condition.value) 
@@ -377,7 +413,17 @@ bool RecordManager::judgeCondition(string tableName, Tuple& tuple, SelectConditi
 Tuple RecordManager::charToTuple(const Table& table, char* c) {
     Tuple tuple;
     char* original = c;
-    // get the first row index
+    // get tuple status
+    if ( c[0] == '0' )
+        tuple.setDeleted(true);
+    else if ( c[0] == '1' )
+        tuple.setDeleted(false);
+    else {
+        cout << "charToTuple error!" << endl;
+        return tuple;
+    }
+    c += sizeof(char);
+    // get the row index
     int* tmp = (int*)malloc(sizeof(int));
     memmove(tmp, c, sizeof(int));
     tuple.setIndex(*tmp);
@@ -401,7 +447,13 @@ Tuple RecordManager::charToTuple(const Table& table, char* c) {
 
 void RecordManager::tupleToChar(Tuple& tuple, char* c) {
     char* original = c;
-    // store the tuple index first
+    // store the tuple status first
+    if ( tuple.isDeleted() )
+        c[0] = '0';
+    else
+        c[0] = '1';
+    c += sizeof(char);
+    // store the tuple index next
     int index = tuple.getIndex();
     memmove(c, &index, sizeof(int));
     // store all the attributes of the tuple

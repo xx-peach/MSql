@@ -1,10 +1,10 @@
-employee name 9 3
+employee name 2 3
 name                                              CHAR      10        1 
 age                                               INT       4         0 
 salary                                            FLOAT     4         0 
 1
 idx_name                                          name                                              
-t id 4 2
+t id 0 2
 id                                                INT       4         1 
 name                                              CHAR      10        0 
 2

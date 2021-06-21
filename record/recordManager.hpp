@@ -46,7 +46,7 @@ public:
     Result selectAttribute(string tableName, string attributeName, vector<Element>& elements);
 
     /* middle interface that write to buffer */
-    bool writeToBuffer(string tableName, int rowNum, char* data, int rowLength);
+    bool writeToBuffer(string tableName, int rowNum, char* data, int rowLength, bool isDelete);
 
     /* middle interface that read data from buffer */
     bool readFromBuffer(string tableName, int rowNum, char* data, int rowLength);
