@@ -4,3 +4,9 @@ age                                               INT       4         0
 salary                                            FLOAT     4         0 
 1
 idx_name                                          name                                              
+t id 4 2
+id                                                INT       4         1 
+name                                              CHAR      10        0 
+2
+t_id                                              id                                                
+t_id_idx                                          id                                                

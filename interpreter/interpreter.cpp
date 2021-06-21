@@ -39,6 +39,22 @@ Element Interpreter::getElement(string& s) {
 
 
 /**
+ * @prototype: string removeQuotes(string&);
+ * @function: remove quotes from a string
+ **/
+string Interpreter::removeQuotes(string& s) {
+    if ( s.find_first_of("'") != -1 ) {
+        return s.substr(1, s.size()-2);
+    }
+    else if ( s.find_first_of("\"") != -1 ) {
+        return s.substr(1, s.size()-2);
+    }
+    else {
+        return s;
+    }
+}
+
+/**
  * @prototype: getElement(const string&);
  * @function: construct an Element object from a given string
  **/
@@ -336,7 +352,7 @@ void Interpreter::interpret(const string& s) {
                 for ( ; i < tokenList.size(); i++ ) {
                     // cout << "Type: " << getType(tokenList[i]);
                     // cout << ", string: " << tokenList[i] << endl;
-                    tupleString.push_back(make_pair(getType(tokenList[i]), tokenList[i]));
+                    tupleString.push_back(make_pair(getType(tokenList[i]), removeQuotes(tokenList[i])));
                 }
                 // cout << "this" << endl;
                 api.insertTuple(tableName, tupleString);

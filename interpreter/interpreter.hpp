@@ -17,6 +17,7 @@ private:
     bool isSpace(const string&);
     CMP getLogic(const string&, const string&);
     Element getElement(string&);
+    string removeQuotes(string&);
     NumType getType(const string&);
 public:
     Interpreter(API&);
