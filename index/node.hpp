@@ -148,8 +148,18 @@ template <class T>
 int Node<T>::Search(T value){
     if(element_num<=0)return -1;//empty node, actually will not happen
     if constexpr (std::is_same<typename std::decay<T>::type, char*>::value){
-        if(strcmp(element[0],value)>0)return -1;
-        if(strcmp(element[element_num-1],value)<0)return -(element_num+1);
+        string element_0_s = element[0];
+        string element_last_s = element[element_num-1];
+        string value_s = value;
+        cout << "char cmp\n";
+        if(element_0_s > value_s){
+            cout << "return -1\n";
+            return -1;
+        }
+        if(element_last_s < value_s){
+            cout << "return " << -(element_num+1);
+            return -(element_num+1);
+        }
     }else{
         if(element[0] > value) return -1;//not find
         if(element[element_num-1] < value)return -(element_num+1);//not find
@@ -160,9 +170,21 @@ int Node<T>::Search(T value){
         while(left<=right){
             mid = (left + right) >> 1;
             if constexpr (std::is_same<typename std::decay<T>::type, char*>::value){
-                if(strcmp(element[mid],value)==0)return mid;
-                else if(strcmp(element[mid],value)<0)left = mid + 1;
-                else right = mid - 1;
+                string element_mid_s = element[mid];
+                string value_s = value;
+                cout << "char cmp\n";
+                if(element_mid_s == value_s){
+                    cout << "return\n"<< mid;
+                    return mid;
+                }
+                else if(element_mid_s < value_s){
+                    cout << "left = mid + 1\n";
+                    left = mid + 1;
+                }
+                else{
+                    cout << "right = mid -1\n";
+                    right = mid - 1;
+                }
             }else{
                 if(element[mid]==value)return mid;
                 else if(element[mid] < value) left = mid+1;

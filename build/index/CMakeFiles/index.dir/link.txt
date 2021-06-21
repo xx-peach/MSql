@@ -1,0 +1,2 @@
+/usr/bin/ar qc libindex.a  CMakeFiles/index.dir/index_manager.cpp.o
+/usr/bin/ranlib libindex.a

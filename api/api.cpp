@@ -32,17 +32,19 @@ void API::createTable(const string& tableName, const vector<Attribute>& attribut
     for ( int i = 0; i < attributes.size(); i++ ) {
         cout << attributes[i].attributeName << ", " << attributes[i].type.get_type() << ", " << attributes[i].isUnique << endl;
     }
-    this->createIndex(primaryKey+"idx",tableName,primaryKey);
 
     // cout << "tableName: " << tableName << ", primary key: " << primaryKey << endl;
     // for ( int i = 0; i < attributes.size(); i++ ) {
     //     cout << attributes[i].attributeName << ", " << attributes[i].type.get_type() << ", " << attributes[i].isUnique << endl;
     // }
-    Result res = catalog_manager.createTable(tableName, primaryKey, attributes);
+    // Result res = catalog_manager.createTable(tableName, primaryKey, attributes);
+    this->createIndex(tableName+"_"+primaryKey+"_idx",tableName,primaryKey);
 }
 
 void API::dropTable(const string& tableName) {
     Result res = catalog_manager.dropTable(tableName);
+    // string indexName = catalog_manager
+    // this->dropIndex();
 }
 
 void API::createIndex(const string& indexName, const string& tableName, const string& attributeName) {
@@ -62,7 +64,7 @@ void API::createIndex(const string& indexName, const string& tableName, const st
         cout << "create index 5\n";
         for(int i=0; i < elements.size(); i++){//all the elements
             data= elements[i].elementToString();
-            offset = i/(block_size/(catalog_manager.get_row_length(tableName)));//get block_index
+            offset = i;//offset = row number
             index_manager.insert_index(tableName,attributeName,type,data,offset);
         }
         index_manager.show_index(tableName,attributeName,type);
@@ -110,6 +112,17 @@ void API::selectTuple(const string& tableName, vector<SelectCondition>& selectCo
 
 void API::insertTuple(const string& tableName, vector<pair<NumType, string>>& tupleString) {
     Result res = record_manager.insertTuple(catalog_manager.get_table(tableName), tupleString);
+    string primaryKey = catalog_manager.get_primary_key(tableName);
+    string indexName = catalog_manager.get_index_name(tableName,primaryKey);
+    FieldType type = catalog_manager.getTypeByIndexName(indexName);
+    vector<Element> elements;
+    record_manager.selectAttribute(tableName, primaryKey, elements);//get attributes
+    cout << "elements.size() = " << elements.size() << endl;
+    string data= elements[elements.size()-1].elementToString();
+    int offset = elements.size()-1;//row number =last row
+    index_manager.insert_index(tableName,primaryKey,type,data,offset);
+    index_manager.show_index(tableName,primaryKey,type);
+    cout << "create index 6\n";
 }
 
 void API::deleteTuple(const string& tableName, vector<SelectCondition>& selectConditions) {
