@@ -44,10 +44,8 @@ private:
 		ifstream file;
 		file.open(tableFileName, ios::in);
 		if ( !file.is_open() ) {
-			throw MError(TABLE_CATALOG_FILE_READ_ERROR);
-			// cout << "CatalogMana?ger::initialTable error, open file " << tableFileName << " fail" << endl;
-			// file.close();
-			// return TABLE_CATALOG_FILE_READ_ERROR;
+			file.open(tableFileName, ios::in | ios::out);
+			file.close();
 		}
 		else {
 			string tmpTableName, tmpPrimaryKey;
@@ -58,6 +56,10 @@ private:
 				vector<Index> tmpIndexVector;
 				// read in the statistical data of the table
 				file >> tmpTableName >> tmpPrimaryKey >> tmpRowNum >> tmpAttributeNum;
+				// cout << "Read:" << endl;
+				// cout << tmpTableName << endl << tmpPrimaryKey << endl << tmpRowNum << endl << tmpAttributeNum << endl;
+				if(tmpTableName == "")
+					break;
 				// read in every attribute information of the table
 				for ( int i = 0; i < tmpAttributeNum; i++ ) {
 					int tmpLength;		// attribute length
@@ -67,11 +69,11 @@ private:
 					// read in the statistical data of the attributes
 					file >> tmpAttributeName >> tmpType >> tmpLength >> tmpIsUnique;
 					if ( tmpType == "CHAR" )
-                        tmpNumType = CHAR;
+						tmpNumType = CHAR;
 					else if ( tmpType == "FLOAT" )
-                        tmpNumType = FLOAT;
+						tmpNumType = FLOAT;
 					else if ( tmpType == "INT" )
-                        tmpNumType = INT;
+						tmpNumType = INT;
 					Attribute tmpAttribute(tmpAttributeName, tmpNumType, tmpLength, tmpIsUnique);
 					tmpAttributeVector.push_back(tmpAttribute);
 				}
@@ -90,8 +92,8 @@ private:
 				tables.insert(make_pair(tmpTableName, tmpTable));
 			}
 			file.close();
-			return SUCCESS;
 		}
+		return SUCCESS;
 	}
 
 	/* initialize the indexes, read index information from file index.cat */
@@ -99,10 +101,8 @@ private:
 		ifstream file;
 		file.open(indexFileName, ios::in);
 		if ( !file.is_open() ) {
-			throw MError(TABLE_CATALOG_FILE_READ_ERROR);
-			// cout << "CatalogManager::initialIndex error, open file" << indexFileName << " fail" << endl;
-			// file.close();
-			// return INDEX_CATALOG_FILE_READ_ERROR;
+			file.open(indexFileName, ios::in | ios::out);
+			file.close();
 		}
 		else {
 			int tmpBlockNum, tmpRootNum;
@@ -112,7 +112,7 @@ private:
 				// read in the statistical data
 				file >> tmpIndexName >> tmpTableName >> tmpAttributeName >> tmpBlockNum >> tmpRootNum;
 				if ( tmpIndexName == "")
-					continue;
+					break;
 				// instantiation a Index object
 				Index tmpIndex(tmpIndexName, tmpTableName, tmpAttributeName, tmpBlockNum, tmpRootNum);
 				// add the new index into the indexes map
@@ -120,8 +120,8 @@ private:
 				table_attrToIndex.insert(make_pair(tmpIndex.tableName + " " + tmpIndex.attributeName, tmpIndex.indexName));
 			}
 			file.close();
-			return SUCCESS;
 		}
+		return SUCCESS;
 	}
 
 	/* store the tables to table.cat */
@@ -205,7 +205,7 @@ public:
 	}
 
 	~CatalogManager() {
-		storeCatalog();
+		// storeCatalog();
 	}
 
 	string getTableNameByIndexName(string indexName) {
@@ -560,6 +560,7 @@ public:
 	void show_table() {
 		Table tmpTable;
 		Attribute tmpAttribute;
+		cout << "There are " << tables.size() << " table(s) in total:" << endl;
 		for(auto it : tables) {
 			tmpTable = it.second;
 			cout << "[TABLE] " << tmpTable.tableName << endl;
@@ -574,6 +575,7 @@ public:
 	void show_index() {
 		Index tmpIndex;
 		int idx = 5, tab = 5, attr = 9; // "INDEX", "TABLE", "ATTRIBUTE"
+		cout << "There are " << indexes.size() << " index(es) in total:" << endl;
 		for(auto it : indexes) {
 			tmpIndex = it.second;
 			idx = tmpIndex.indexName.length() > idx ? tmpIndex.indexName.length() : idx;
