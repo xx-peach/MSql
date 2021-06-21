@@ -32,18 +32,6 @@ string UI::fetchStatement() const {
 }
 
 void UI::plotTable(const vector<Tuple>& tuples, const vector<string>& titles, const vector<int>& attrIndexs) const {
-	// print the prompt of how many tuples selected
-	switch (tuples.size()) {
-		case 0:
-			cout << "0 record selected" << endl;
-			return;
-		case 1:
-			cout << "1 record selected" << endl;
-			break;
-		default:
-			cout << tuples.size() << " records selected" << endl;
-			break;
-	}
 	// push the title into the printList
 	int size;
 	vector<vector<string>> printList;
@@ -103,5 +91,17 @@ void UI::plotTable(const vector<Tuple>& tuples, const vector<string>& titles, co
 	for ( int j = 0; j < maxLens.size(); j++ ) {
 		cout << "+" << string(maxLens[j]+1, '-');
 	}
-	cout << "+" << endl;;
+	cout << "+" << endl;
+	// print the prompt of how many tuples selected
+	switch (tuples.size()) {
+		case 0:
+			cout << "0 record selected" << endl;
+			return;
+		case 1:
+			cout << "1 record selected" << endl;
+			break;
+		default:
+			cout << tuples.size() << " records selected" << endl;
+			break;
+	}
 }

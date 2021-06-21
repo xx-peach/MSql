@@ -28,10 +28,10 @@ vector<string> API::fetchFile(const string& fileName) const {
 
 void API::createTable(const string& tableName, const vector<Attribute>& attributes, const string& primaryKey ) {
     Result res = catalog_manager.createTable(tableName, primaryKey, attributes);
-    cout << "tableName: " << tableName << ", primary key: " << primaryKey << endl;
-    for ( int i = 0; i < attributes.size(); i++ ) {
-        cout << attributes[i].attributeName << ", " << attributes[i].type.get_type() << ", " << attributes[i].isUnique << endl;
-    }
+    // cout << "tableName: " << tableName << ", primary key: " << primaryKey << endl;
+    // for ( int i = 0; i < attributes.size(); i++ ) {
+    //     cout << attributes[i].attributeName << ", " << attributes[i].type.get_type() << ", " << attributes[i].isUnique << endl;
+    // }
 
     // cout << "tableName: " << tableName << ", primary key: " << primaryKey << endl;
     // for ( int i = 0; i < attributes.size(); i++ ) {
@@ -48,29 +48,29 @@ void API::dropTable(const string& tableName) {
 }
 
 void API::createIndex(const string& indexName, const string& tableName, const string& attributeName) {
-    cout << "create index 1\n";
+    // cout << "create index 1\n";
     Result res1 = catalog_manager.createIndex(indexName, tableName, attributeName);
-    cout << "create index 2\n";
+    // cout << "create index 2\n";
     FieldType type = catalog_manager.getTypeByIndexName(indexName);
-    cout << "create index 3\n";
+    // cout << "create index 3\n";
     Result res2 = index_manager.create_index(tableName,attributeName,type);
-    cout << "create index 4\n";
+    // cout << "create index 4\n";
     //insert all the tuples with indexs
     vector<Element> elements;
     string data;
     int offset;
     if(catalog_manager.is_unique(tableName,attributeName)){
         record_manager.selectAttribute(tableName, attributeName, elements);
-        cout << "create index 5\n";
+        // cout << "create index 5\n";
         for(int i=0; i < elements.size(); i++){//all the elements
             data= elements[i].elementToString();
             offset = i;//offset = row number
             index_manager.insert_index(tableName,attributeName,type,data,offset);
         }
-        index_manager.show_index(tableName,attributeName,type);
-        cout << "create index 6\n";
+        // index_manager.show_index(tableName,attributeName,type);
+        // cout << "create index 6\n";
     }else{
-        cout << "create index error! attribute " + attributeName + " is not unique\n";
+        // cout << "create index error! attribute " + attributeName + " is not unique\n";
     }
     
 }
@@ -117,12 +117,12 @@ void API::insertTuple(const string& tableName, vector<pair<NumType, string>>& tu
     FieldType type = catalog_manager.getTypeByIndexName(indexName);
     vector<Element> elements;
     record_manager.selectAttribute(tableName, primaryKey, elements);//get attributes
-    cout << "elements.size() = " << elements.size() << endl;
+    // cout << "elements.size() = " << elements.size() << endl;
     string data= elements[elements.size()-1].elementToString();
     int offset = elements.size()-1;//row number =last row
     index_manager.insert_index(tableName,primaryKey,type,data,offset);
-    index_manager.show_index(tableName,primaryKey,type);
-    cout << "create index 6\n";
+    // index_manager.show_index(tableName,primaryKey,type);
+    // cout << "create index 6\n";
 }
 
 void API::deleteTuple(const string& tableName, vector<SelectCondition>& selectConditions) {

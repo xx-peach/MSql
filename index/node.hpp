@@ -151,13 +151,13 @@ int Node<T>::Search(T value){
         string element_0_s = element[0];
         string element_last_s = element[element_num-1];
         string value_s = value;
-        cout << "char cmp\n";
+        // cout << "char cmp\n";
         if(element_0_s > value_s){
-            cout << "return -1\n";
+            // cout << "return -1\n";
             return -1;
         }
         if(element_last_s < value_s){
-            cout << "return " << -(element_num+1);
+            // cout << "return " << -(element_num+1);
             return -(element_num+1);
         }
     }else{
@@ -172,17 +172,17 @@ int Node<T>::Search(T value){
             if constexpr (std::is_same<typename std::decay<T>::type, char*>::value){
                 string element_mid_s = element[mid];
                 string value_s = value;
-                cout << "char cmp\n";
+                // cout << "char cmp\n";
                 if(element_mid_s == value_s){
-                    cout << "return\n"<< mid;
+                    // cout << "return\n"<< mid;
                     return mid;
                 }
                 else if(element_mid_s < value_s){
-                    cout << "left = mid + 1\n";
+                    // cout << "left = mid + 1\n";
                     left = mid + 1;
                 }
                 else{
-                    cout << "right = mid -1\n";
+                    // cout << "right = mid -1\n";
                     right = mid - 1;
                 }
             }else{

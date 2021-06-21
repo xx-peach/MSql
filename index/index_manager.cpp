@@ -15,19 +15,19 @@ void IndexManager::new_file(string file_name){
 //get the order(n) of the b+ tree
 int IndexManager::get_order(FieldType type){
     int order = 10;
-    // switch(type.get_type()){
-    //     //max: (block_size - (is_leaf + num + parent_index + next_leaf_index)),left block_t and int or 2 block_t
-    //     case CHAR:{
-    //         order = (block_size - (sizeof(char) + sizeof(int) + sizeof(block_t)*2)) / (type.get_length() + sizeof(int)) -1 ;break;
-    //     }//one sizeof(int) for exception
-    //     case INT:{
-    //         order = (block_size - (sizeof(char) + sizeof(int) + sizeof(block_t)*2)) / (sizeof(int)*2) -1 ;break;
-    //     }
-    //     case FLOAT:{
-    //         order = (block_size - (sizeof(char) + sizeof(int) + sizeof(block_t)*2)) / (sizeof(float) + sizeof(int)) -1 ;;break;
-    //     }
-    //     default:;
-    // }
+    switch(type.get_type()){
+        //max: (block_size - (is_leaf + num + parent_index + next_leaf_index)),left block_t and int or 2 block_t
+        case CHAR:{
+            order = (block_size - (sizeof(char) + sizeof(int) + sizeof(block_t)*2)) / (type.get_length() + sizeof(int)) -1 ;break;
+        }//one sizeof(int) for exception
+        case INT:{
+            order = (block_size - (sizeof(char) + sizeof(int) + sizeof(block_t)*2)) / (sizeof(int)*2) -1 ;break;
+        }
+        case FLOAT:{
+            order = (block_size - (sizeof(char) + sizeof(int) + sizeof(block_t)*2)) / (sizeof(float) + sizeof(int)) -1 ;;break;
+        }
+        default:;
+    }
     return order;
 }
 

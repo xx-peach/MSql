@@ -1,46 +1,6 @@
-chartable id 0 2
-id                                                CHAR      10        1 
-num                                               INT       4         1 
-2
-chartable_id                                      id                                                
-chartable_id_idx                                  id                                                
-ctb id 0 3
-id                                                CHAR      10        1 
-num                                               INT       4         1 
-ff                                                FLOAT     4         1 
-2
-ctb_id                                            id                                                
-ctb_id_idx                                        id                                                
-employee name 8 3
+employee name 9 3
 name                                              CHAR      10        1 
 age                                               INT       4         0 
 salary                                            FLOAT     4         0 
-2
+1
 idx_name                                          name                                              
-nameidx2                                          name                                              
-minisql interpreter 0 6
-interpreter                                       CHAR      10        1 
-api                                               CHAR      10        0 
-record                                            INT       4         0 
-catalog                                           INT       4         0 
-index                                             FLOAT     4         0 
-buffer                                            FLOAT     4         1 
-1
-minisql_interpreter                               interpreter                                       
-mly id 0 2
-id                                                INT       4         1 
-score                                             FLOAT     4         1 
-2
-mly_id                                            id                                                
-mly_id_idx                                        id                                                
-students id 2 2
-id                                                INT       4         1 
-name                                              CHAR      10        0 
-1
-students_id                                       id                                                
-tb id 3 2
-id                                                INT       4         1 
-score                                             FLOAT     4         1 
-2
-tb_id                                             id                                                
-tb_id_idx                                         id                                                
