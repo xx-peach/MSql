@@ -215,7 +215,7 @@ int RecordManager::deleteTuple(Table& table, vector<SelectCondition>& selectCond
         for ( int j = 0; j < attrIndex.size(); j++ )
 		    index_manager.delete_index(table.tableName, table.attributeVector[attrIndex[j]].attributeName, table.attributeVector[attrIndex[j]].type, tuple.getData()[attrIndex[j]].elementToString());
     }
-    table.rowNum -= deleteNum;
+    // table.rowNum -= deleteNum;
     return deleteNum;
 }
 
@@ -288,6 +288,7 @@ bool RecordManager::writeToBuffer(string tableName, int rowNum, char* data, int 
     }
     if ( isDelete ) {
         memmove(&((*block)->data[offset*rowLength]), data, rowLength);
+        (*block)->block_dirty_bit = 1;
         return true;;
     }
     else
