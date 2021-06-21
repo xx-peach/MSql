@@ -118,39 +118,29 @@ Result RecordManager::selectTuple(const Table& table, vector<SelectCondition>& s
             selectConditions[i].value.setType(FLOAT);
     }
     vector<bool> isConditionWithIndex(conditionNum, false);
-    int cntIndex = 0, cntNormal = 0;
+    int cntIndex = 0;
     vector<int> idx;
-    while (1) {
-        int tmp = -1;
-        for ( int i = 0; i < conditionNum; i++ ) {
-            if ( isConditionWithIndex[i] == true )
-                continue;
-            if ( !(table.attributeVector[selectConditions[i].attributeIndex].isUnique) )
-                continue;
-            if ( !catalog_manager.is_index_exist(table.tableName, table.attributeVector[i].attributeName) )
-                continue;
-            tmp = i; // A condition's attribute with index found
-            break;
-        }
-        if ( tmp == -1 )
-            break;
-        isConditionWithIndex[tmp] = true;
-        if ( cntIndex == 0 ) {
-            idx = selectWithIndex(table, selectConditions[tmp]);
+    for ( int i = 0; i < conditionNum; i++ ) {
+        if ( !(table.attributeVector[selectConditions[i].attributeIndex].isUnique) )
+            continue;
+        if ( !catalog_manager.is_index_exist(table.tableName, table.attributeVector[i].attributeName) )
+            continue;
+        isConditionWithIndex[i] = true;
+        if ( cntIndex++ == 0 ) {
+            idx = selectWithIndex(table, selectConditions[i]);
             sort(idx.begin(), idx.end());
         }
         else {
-            vector<int> tmpIdx = selectWithIndex(table, selectConditions[tmp]);
+            vector<int> tmpIdx = selectWithIndex(table, selectConditions[i]);
             sort(tmpIdx.begin(), tmpIdx.end());
-            for ( int i = 0; i < idx.size(); i++ ) {
+            for ( int j = 0; j < idx.size(); j++ ) {
                 // not satisfied with conditions joined
-                if ( find(tmpIdx.begin(), tmpIdx.end(), idx[i]) == tmpIdx.end() ) {
-                    idx.erase(idx.begin() + i);
-                    i--;
+                if ( find(tmpIdx.begin(), tmpIdx.end(), idx[j]) == tmpIdx.end() ) {
+                    idx.erase(idx.begin() + j);
+                    j--;
                 }
             }
         }
-        cntIndex++;
     }
     // no index available
     if ( cntIndex == 0 ) return selectTupleWithoutIndex(table, selectConditions, tuples);
@@ -160,18 +150,10 @@ Result RecordManager::selectTuple(const Table& table, vector<SelectCondition>& s
             tuples.push_back(tmp);
         }
     }
-    while (1) {
-        int tmp = -1;
-        for ( int i = 0; i < conditionNum; i++ ) {
-            if(isConditionWithIndex[i])
-                continue;
-            tmp = i;                        // a condition without index found
-            break;
-        }
-        if ( tmp == -1 )
-            break;                          // all conditions checked
-        isConditionWithIndex[tmp] = true;   // mark the condition checked, although it has no index
-        selectWithoutIndex(table.tableName, selectConditions[tmp], tuples);
+    for ( int i = 0; i < conditionNum; i++ ) {
+        if( isConditionWithIndex[i] )
+            continue;
+        selectWithoutIndex(table.tableName, selectConditions[i], tuples);
     }
     return SUCCESS;
 }
@@ -333,22 +315,23 @@ bool RecordManager::isMatchTheAttribute(const Table& table, Tuple& tuple) {
 }
 
 bool RecordManager::isConflictTheUnique(const Table& table, Tuple& tuple) {
-    char* value = (char*)malloc(table.rowLength * sizeof(char));
     int attrNum = table.attributeNum;
     for(int i = 0; i < attrNum; i++){
         if(!table.attributeVector[i].isUnique)
             continue;
-        /*if(catalog_manager.is_index_exist(table.tableName, table.attributeVector[i].attributeName)) { // Use index to find directly
+        if(catalog_manager.is_index_exist(table.tableName, table.attributeVector[i].attributeName)) { // Use index to find directly
             vector<int> idx;
             idx.clear();
+            string value_str = tuple.getData()[i].elementToString();
+            char* value = (char*)value_str.c_str();
             if(index_manager.find_element(table.tableName, table.attributeVector[i].attributeName, table.attributeVector[i].type, value, idx) == SUCCESS)
                 return true;
-        } else { // Iteration without index*/
+        } else { // Iteration without index
             for(int j = 0; j < table.rowNum; j++){
                 Tuple tmpTuple = getTupleByRowNumber(table, j);
                 if (tmpTuple.getData()[i] == tuple.getData()[i])
                     return true;
-            // }
+             }
         }
     }
     return false;
