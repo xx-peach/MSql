@@ -10,7 +10,7 @@ int main() {
    UI ui;
    BufferManager buffer_manager;
    IndexManager index_manager(buffer_manager);
-   CatalogManager catalog_manager(buffer_manager);
+   CatalogManager catalog_manager(buffer_manager, index_manager);
    RecordManager record_manager(index_manager, buffer_manager, catalog_manager);
    API api(catalog_manager, record_manager, index_manager, ui);
    Interpreter interpreter(api);
