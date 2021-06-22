@@ -83,6 +83,7 @@ enum Result {
     INSERT_FAIL=-85,				//when insert failed
     DELETE_FAIL=-86,				//when delete failed
     ERROR_CMP_VALUE=-87,            //input error cmp value
+    ELEMENT_ALREADY_IN_TREE=-88,    //element already in tree
 
     // Catalog
     TABLE_NAME_EXSITED = -101,                  // When creating a new table

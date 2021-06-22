@@ -1,6 +1,7 @@
 #ifndef _NODE_HPP_
 #define _NODE_HPP_
 #include "../buffer/buffer.hpp"
+#include "../config.hpp"
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
@@ -41,10 +42,10 @@ public:
     void Splite(T &value, std::shared_ptr<Node<T>> &NewNode);
 
     //not leaf node add value
-    void AddElementNonLeafNode(T value, std::shared_ptr<Node<T>> new_child_node); 
+    Result AddElementNonLeafNode(T value, std::shared_ptr<Node<T>> new_child_node); 
 
     //leaf node add value
-    void AddElementLeafNode(T value, int offset);
+    Result AddElementLeafNode(T value, int offset);
 
     //delete the element of given index
     void DeleteElement(int index);       
@@ -70,9 +71,10 @@ public:
     }
 
     //for error information
-    void AlreadyExist(T value){
-        this->OutputNode();
-        cout<< endl << "[ERROR]Element " << value <<" is already in this node." << endl;
+    Result AlreadyExist(T value){
+        // this->OutputNode();
+        // cout<< endl << "[ERROR]Element " << value <<" is already in this node." << endl;
+        return ELEMENT_ALREADY_IN_TREE;
     }
 };
 
@@ -193,7 +195,7 @@ int Node<T>::Search(T value){
         }
         return -(left+1);//not find, need to insert at |here|-1 = left index
     }
-    cout << "[ERROR]Node<T>::Search(" << value <<") failed." <<endl;
+    // cout << "[ERROR]Node<T>::Search(" << value <<") failed." <<endl;
     return -1;
 }
 
@@ -230,7 +232,7 @@ void Node<T>::Splite(T &value, std::shared_ptr<Node<T>> &NewNode){
 
 //find the place value should be, and add in the new child node
 template<class T>
-void Node<T>::AddElementNonLeafNode(T value, std::shared_ptr<Node<T>> new_child_node){
+Result Node<T>::AddElementNonLeafNode(T value, std::shared_ptr<Node<T>> new_child_node){
     int insert_index = Search(value);
     if(insert_index < 0){
         insert_index = - insert_index - 1;
@@ -242,14 +244,15 @@ void Node<T>::AddElementNonLeafNode(T value, std::shared_ptr<Node<T>> new_child_
         this->childs_index[insert_index +1] = new_child_node->block_index;
         new_child_node->parent_index = this->block_index;
         this->element_num++;
+        return SUCCESS;
     }else{//already exist
-        AlreadyExist(value);
+        return ELEMENT_ALREADY_IN_TREE;
     }
 }
 
 //find the place value should be, and add in the new child node
 template <class T>
-void Node<T>::AddElementLeafNode(T value, int offset){                                 //leaf node add
+Result Node<T>::AddElementLeafNode(T value, int offset){                                 //leaf node add
     int insert_index = Search(value);
     if(insert_index < 0){
         insert_index = - insert_index - 1;
@@ -260,8 +263,9 @@ void Node<T>::AddElementLeafNode(T value, int offset){                          
         this->element[insert_index] = value;
         this->offset[insert_index] = offset;
         this->element_num++;
+        return SUCCESS;
     }else{//already exist
-        AlreadyExist(value);
+        return ELEMENT_ALREADY_IN_TREE;
     }
 }
 
