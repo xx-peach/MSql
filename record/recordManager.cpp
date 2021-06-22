@@ -70,7 +70,7 @@ Result RecordManager::insertTuple(Table& table, vector<pair<NumType, string>>& t
             e.setData(tupleString[i].second);
         tuple.push_back_Data(e);
     }
-    return insertTuple(table, tuple);
+    return insertTuple(table, tuple); 
 }
 
 /**
@@ -261,6 +261,18 @@ Result RecordManager::selectAttribute(string tableName, string attributeName, ve
     return SUCCESS;
 }
 
+/**
+ * @prototype: selectAttribute(string tableName, string attributeName, vector<Element> elements);
+ * @function: select the last values of an attribute in a table
+ **/
+Result RecordManager::selectlastAttribute(string tableName, string attributeName, Element& element, int& table_row_num) {
+    int attributeIndex = catalog_manager.get_attribute_index(tableName, attributeName);
+    Table table = catalog_manager.get_table(tableName);
+    Tuple tmp = getTupleByRowNumber(table, table.rowNum-1);//last one tuple
+    element = tmp.getData()[attributeIndex];
+    table_row_num = table.rowNum;
+    return SUCCESS;
+}
 
 bool RecordManager::writeToBuffer(string tableName, int rowNum, char* data, int rowLength, bool isDelete) {
     fiter file = buffer_manager.getFile(tableName, 0, rowLength, rowNum);

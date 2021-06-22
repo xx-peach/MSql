@@ -45,6 +45,10 @@ public:
     /* Select all values of an attribute in a table */
     Result selectAttribute(string tableName, string attributeName, vector<Element>& elements);
 
+    /* Select the last tuple attribute in a table*/
+    Result selectlastAttribute(string tableName, string attributeName, Element& element,int& table_row_num);
+
+
     /* middle interface that write to buffer */
     bool writeToBuffer(string tableName, int rowNum, char* data, int rowLength, bool isDelete);
 

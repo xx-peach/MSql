@@ -115,11 +115,12 @@ void API::insertTuple(const string& tableName, vector<pair<NumType, string>>& tu
     string primaryKey = catalog_manager.get_primary_key(tableName);
     string indexName = catalog_manager.get_index_name(tableName,primaryKey);
     FieldType type = catalog_manager.getTypeByIndexName(indexName);
-    vector<Element> elements;
-    record_manager.selectAttribute(tableName, primaryKey, elements);//get attributes
+    Element element;
+    int table_row_num;
+    record_manager.selectlastAttribute(tableName, primaryKey, element, table_row_num);//get attributes
     // cout << "elements.size() = " << elements.size() << endl;
-    string data= elements[elements.size()-1].elementToString();
-    int offset = elements.size()-1;//row number =last row
+    string data= element.elementToString();
+    int offset = table_row_num-1;//row number =last row
     index_manager.insert_index(tableName,primaryKey,type,data,offset);
     // index_manager.show_index(tableName,primaryKey,type);
     // cout << "create index 6\n";

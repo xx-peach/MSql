@@ -5,3 +5,12 @@ salary                                            FLOAT     4         0
 2
 e_name                                            name                                              
 e_name_idx                                        name                                              
+students id 0 5
+id                                                CHAR      10        1 
+name                                              CHAR      40        0 
+credit                                            INT       4         0 
+score                                             INT       4         0 
+dept_name                                         CHAR      40        0 
+2
+students_id                                       id                                                
+students_id_idx                                   id                                                
