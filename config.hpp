@@ -97,7 +97,9 @@ enum Result {
     INDEX_CATALOG_FILE_WRITE_ERROR = -110,      // index.cat write error
 
     // Buffer
-
+    BUFFER_FILE_NOT_EXIST = -121,
+    BUFFER_READ_FILE_NOT_EXIST = -122,
+    BUFFER_OVERFLOW = -123
 };
 
 /* Types of attributes/elements */
