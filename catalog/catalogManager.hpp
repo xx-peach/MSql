@@ -203,7 +203,7 @@ public:
 	}
 
 	~CatalogManager() {
-		// storeCatalog();
+		storeCatalog();
 	}
 
 	string getTableNameByIndexName(string indexName) {

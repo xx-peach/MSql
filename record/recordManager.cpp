@@ -195,6 +195,8 @@ int RecordManager::deleteTuple(Table& table, vector<SelectCondition>& selectCond
         Tuple tuple = searchResult[i];
         if ( tuple.isDeleted() ) {
             cout << "The tuple is already deleted." << endl;
+            cout << tuple.getIndex() << endl;
+            deleteNum--;
             continue;
         }
         char* tmpData = (char*)malloc(table.rowLength * sizeof(char));
@@ -205,6 +207,8 @@ int RecordManager::deleteTuple(Table& table, vector<SelectCondition>& selectCond
         readFromBuffer(table.tableName, tuple.getIndex(), tmpData, table.rowLength);
         if ( tmpData[0] == '0' ) {
             cout << "The tuple is already deleted." << endl;
+            cout << tuple.getIndex() << endl;
+            deleteNum--;
             free(tmpData);
             continue;
         }
@@ -218,7 +222,6 @@ int RecordManager::deleteTuple(Table& table, vector<SelectCondition>& selectCond
         for ( int j = 0; j < attrIndex.size(); j++ )
 		    index_manager.delete_index(table.tableName, table.attributeVector[attrIndex[j]].attributeName, table.attributeVector[attrIndex[j]].type, tuple.getData()[attrIndex[j]].elementToString());
     }
-    // table.rowNum -= deleteNum;
     return deleteNum;
 }
 
