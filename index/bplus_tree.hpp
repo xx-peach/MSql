@@ -42,8 +42,8 @@ private:
     biter GetBlockOffset(block_t index);
 
     //Error information
-    void InsertFail(T value){cout << "[ERROR]Insert value "<< value << " is already in the tree" <<endl;}
-    void DeleteFail(T value){cout << "[ERROR]Delete value "<< value << " doesn't exist in the tree" <<endl;}
+    // void InsertFail(T value){cout << "[ERROR]Insert value "<< value << " is already in the tree" <<endl;}
+    // void DeleteFail(T value){cout << "[ERROR]Delete value "<< value << " doesn't exist in the tree" <<endl;}
 
     //set the node empty and write it to buffer
     void SetEmptyBackToBuffer(std::shared_ptr<Node<T>> &node);
@@ -231,7 +231,7 @@ bool BPlusTree<T>::InsertElement(T value, int offset){
         }
         return true;
     }else{//already exist
-        InsertFail(value);
+        // InsertFail(value);
         return false;
     }
 }
@@ -329,7 +329,7 @@ bool BPlusTree<T>::DeleteElement(T value){
     // cout << "delete res_node :" << endl;
     // res_node->OutputNode();
     if(delete_index < 0){//not exist
-        DeleteFail(value);
+        // DeleteFail(value);
         return false;
     }else{//exist
         if(res_node->parent_index == -1){//only one root node
@@ -427,7 +427,7 @@ void BPlusTree<T>::LevelOrderOutput(){
 template <class T>
 bool BPlusTree<T>::UnionOrMoveExe(std::shared_ptr<Node<T>> node){
     if(node->parent_index == -1){//root node, not need to union
-        cout << "[ERROR]Union 2 nodes can not be root." << endl;
+        // cout << "[ERROR]Union 2 nodes can not be root." << endl;
         return false;
     }
     // cout << "union or move node:" <<endl;

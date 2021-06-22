@@ -76,7 +76,8 @@ void Block::read() {
         // close the file
         inFile.close();
     }
-    else cout << "Block::read error, open file " << block_file->file_name << " fail" << endl;
+    // else cout << "Block::read error, open file " << block_file->file_name << " fail" << endl;
+    else throw MError(BUFFER_READ_FILE_NOT_EXIST);
 }
 
 /**
@@ -86,7 +87,6 @@ void Block::read() {
  **/
 bool Block::write( const char* d, int l ) {
     if ( l + byte_offset > block_size || l > block_size ) {
-        cout << "Block::write error, offset = " << byte_offset << ", block overflow" << endl;
         return false;
     }
     else {
@@ -277,7 +277,8 @@ biter BufferManager::getBlockbyOffset( const fiter file, block_t index ) {
     // if not find the erase block, then throw an error
     if ( flag ) return bit;
     else {
-        cout << "BufferManager::getBlockbyOffset error, block not exists, create new one" << endl;
+        // cout << "BufferManager::getBlockbyOffset error, block not exists, create new one" << endl;
+        
         return (*file)->blockList.end();
     }
 }
@@ -315,7 +316,8 @@ void BufferManager::writeBack( Block block ) {
             outFile.write( block.data, block.byte_offset );
             outFile.close();
         }
-        else cout << "BufferManager::writeBack error, " << block.block_file->file_name << " not find";
+        // else cout << "BufferManager::writeBack error, " << block.block_file->file_name << " not find";
+        else throw MError(BUFFER_FILE_NOT_EXIST);
     }
 }
 
@@ -340,7 +342,8 @@ void BufferManager::writeBack( biter block ) {
             outFile.write( (*block)->data, (*block)->byte_offset );
             outFile.close();
         }
-        else cout << "BufferManager::writeBack error, " << (*block)->block_file->file_name << " not find";
+        // else cout << "BufferManager::writeBack error, " << (*block)->block_file->file_name << " not find";
+        else throw MError(BUFFER_FILE_NOT_EXIST);
     }
 }
 

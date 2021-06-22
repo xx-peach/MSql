@@ -116,7 +116,7 @@ void API::insertTuple(const string& tableName, vector<pair<NumType, string>>& tu
     int table_row_num;
     record_manager.selectlastAttribute(tableName, primaryKey, element, table_row_num);  // get attributes
     string data = element.elementToString();
-    int offset = table_row_num-1;   // row number =last row
+    int offset = table_row_num-1;   // row number = last row
     index_manager.insert_index(tableName,primaryKey,type,data,offset);
 }
 

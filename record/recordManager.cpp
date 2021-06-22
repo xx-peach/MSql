@@ -194,7 +194,7 @@ int RecordManager::deleteTuple(Table& table, vector<SelectCondition>& selectCond
     for ( int i = 0; i < deleteNum; i++ ) {
         Tuple tuple = searchResult[i];
         if ( tuple.isDeleted() ) {
-            cout << "The tuple is already deleted." << endl;
+            cout << "The tuple is already deleted because tuple.isDeleted." << endl;
             cout << tuple.getIndex() << endl;
             deleteNum--;
             continue;
@@ -206,7 +206,7 @@ int RecordManager::deleteTuple(Table& table, vector<SelectCondition>& selectCond
         }
         readFromBuffer(table.tableName, tuple.getIndex(), tmpData, table.rowLength);
         if ( tmpData[0] == '0' ) {
-            cout << "The tuple is already deleted." << endl;
+            cout << "The tuple is already deleted because tmpData[0] == '0'." << endl;
             cout << tuple.getIndex() << endl;
             deleteNum--;
             free(tmpData);

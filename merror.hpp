@@ -89,6 +89,15 @@ public:
         else if ( m_badValue == DELETE_TABLE_NOT_EXIST ) {
             cout << "API::deleteTuple error, table not exists" << endl;
         }
+        else if ( m_badValue == BUFFER_FILE_NOT_EXIST ) {
+            cout << "BufferManager::writeBack error, file not exists" << endl;
+        }
+        else if ( m_badValue == BUFFER_READ_FILE_NOT_EXIST ) {
+            cout << "BufferManager::Block::read error, file not exists" << endl;
+        }
+        else if ( m_badValue == BUFFER_OVERFLOW ) {
+            cout << "BufferManager::Block::write error, block overflow" << endl;
+        }
     }
 };
 

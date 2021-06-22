@@ -10,6 +10,7 @@
 
 #include <list>
 #include <string>
+#include "../merror.hpp"
 #include "../config.hpp"
 
 using namespace std;

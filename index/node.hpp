@@ -72,7 +72,7 @@ public:
 
     //for error information
     Result AlreadyExist(T value){
-        this->OutputNode();
+        // this->OutputNode();
         // cout<< endl << "[ERROR]Element " << value <<" is already in this node." << endl;
         return ELEMENT_ALREADY_IN_TREE;
     }

@@ -33,6 +33,7 @@ struct tableAttrName {
 class CatalogManager {
 private:
 	BufferManager& buffer_manager;
+	IndexManager& index_manager;
 	map<string, Table> tables;
 	map<string, Index> indexes;
 	map<string, string> table_attrToIndex;
@@ -198,7 +199,7 @@ private:
 	}
 	
 public:
-	CatalogManager(BufferManager& _buffer_manager): buffer_manager(_buffer_manager) {
+	CatalogManager(BufferManager& _buffer_manager, IndexManager& _index_manager): buffer_manager(_buffer_manager), index_manager(_index_manager) {
 		initialCatalog();
 	}
 
@@ -289,6 +290,9 @@ public:
 		string tableFileName = TABLE_DIR + tableName + TABLE_SUF;
 		remove(indexFileName.c_str());
 		remove(tableFileName.c_str());
+
+		for ( int i = 0; i < tmpTable.attributeNum; i++ )
+		    index_manager.drop_index(tmpTable.tableName, tmpTable.attributeVector[i].attributeName, tmpTable.attributeVector[i].type);
 
 		storeCatalog();
 		initialCatalog();

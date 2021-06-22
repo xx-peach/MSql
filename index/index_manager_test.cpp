@@ -28,8 +28,7 @@ int main(){
 
     time_t begin_t = clock();
     for(int i=0; i<test_size; i++){
-        index_manager.find_element(table_name,attribute_name,field_type,(char*)((to_string(i+123)).c_str()),find_index);
-        index_manager.insert_index(table_name,attribute_name,field_type,to_string(i+123),(0));
+        // index_manager.compares
     }
     time_t finish_t = clock();
     // index_manager.show_index(table_name,attribute_name,field_type);
