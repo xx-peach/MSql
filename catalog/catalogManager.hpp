@@ -56,10 +56,8 @@ private:
 				vector<Index> tmpIndexVector;
 				// read in the statistical data of the table
 				file >> tmpTableName >> tmpPrimaryKey >> tmpRowNum >> tmpAttributeNum;
-				// cout << "Read:" << endl;
-				// cout << tmpTableName << endl << tmpPrimaryKey << endl << tmpRowNum << endl << tmpAttributeNum << endl;
-				if(tmpTableName == "")
-					break;
+				// avoid dead loop when the file is empty!!!
+				if(tmpTableName == "") break;
 				// read in every attribute information of the table
 				for ( int i = 0; i < tmpAttributeNum; i++ ) {
 					int tmpLength;		// attribute length

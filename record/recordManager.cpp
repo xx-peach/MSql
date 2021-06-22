@@ -8,6 +8,12 @@ RecordManager::RecordManager(IndexManager& _index_manager, BufferManager& _buffe
                              index_manager(_index_manager), buffer_manager(_buffer_manager), catalog_manager(_catalog_manager) {}
 
 /**
+ * @prototype: ~RecordManager();
+ * @function: the default destructor
+ **/
+RecordManager::~RecordManager() = default;
+
+/**
  * @prototype: insertTuple(Table& table, Tuple& tuple);
  * @function: insert a tuple into the table
  **/
@@ -26,7 +32,6 @@ Result RecordManager::insertTuple(Table& table, Tuple& tuple) {
         return ERROR;
     }
     tupleToChar(tuple, tmpData);
-    // cout << "tmpData = " << tmpData << endl;
     bool writeResult = writeToBuffer(table.tableName, table.rowNum, tmpData, table.rowLength, false);
     free(tmpData);
     if ( writeResult == false ) {
@@ -43,8 +48,6 @@ Result RecordManager::insertTuple(Table& table, Tuple& tuple) {
  **/
 Result RecordManager::insertTuple(Table& table, vector<pair<NumType, string>>& tupleString) {
     if ( tupleString.size() != table.attributeNum ) {
-        // cout << "tupleString.size(): " << tupleString.size() << endl;
-        // cout << "table.attributeNum: " << table.attributeNum << endl;
         cout << "RecordManager::insertTuple error, tuple attributes do not match the table" << endl;
         return ATTR_NUM_NOT_MATCH;
     }
@@ -229,9 +232,7 @@ vector<int> RecordManager::selectWithIndex(const Table& table, SelectCondition& 
     idx.clear();
     string value_str = condition.value.elementToString();
     char* con_value = (char*)value_str.c_str();
-    cout << "value: " << con_value << endl;
     index_manager.compare(table.tableName, table.attributeVector[condition.attributeIndex].attributeName, table.attributeVector[condition.attributeIndex].type, con_value, idx, condition.conditionType);
-    cout << "size: " << idx.size() << endl;
     return idx;
 }
 
@@ -240,9 +241,11 @@ vector<int> RecordManager::selectWithIndex(const Table& table, SelectCondition& 
  * @function: select with condition without index, private member function used for selectTuple()
  **/
 void RecordManager::selectWithoutIndex(string tableName, SelectCondition& condition, vector<Tuple>& tuples) {
-    for(int i = 0; i < tuples.size(); i++)
-        if(judgeCondition(tableName, tuples[i], condition) == false)
+    for(int i = 0; i < tuples.size(); i++) {
+        if(judgeCondition(tableName, tuples[i], condition) == false) {
             tuples.erase(tuples.begin() + i);
+        }
+    }
 }
 
 /**
