@@ -80,6 +80,15 @@ public:
         else if ( m_badValue == API_FILE_OPEN_FAIL ) {
             cout << "API::fetchFile error, open file fail" << endl;
         }
+        else if ( m_badValue == SELECT_TABLE_NOT_EXIST ) {
+            cout << "API::selectTuple error, table not exists" << endl;
+        }
+        else if ( m_badValue == INSERT_TABLE_NOT_EXIST ) {
+            cout << "API::insertTuple error, table not exists" << endl;
+        }
+        else if ( m_badValue == DELETE_TABLE_NOT_EXIST ) {
+            cout << "API::deleteTuple error, table not exists" << endl;
+        }
     }
 };
 

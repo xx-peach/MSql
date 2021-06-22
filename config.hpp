@@ -65,6 +65,9 @@ enum Result {
 
     // API
     API_FILE_OPEN_FAIL = -41,
+    SELECT_TABLE_NOT_EXIST = -42,
+    INSERT_TABLE_NOT_EXIST = -43,
+    DELETE_TABLE_NOT_EXIST = -44,
 
     // Record
     NO_SUCH_TABLE = -61,

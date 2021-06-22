@@ -84,13 +84,8 @@ void API::dropIndex(const string& indexName) {
 }
 
 void API::selectTuple(const string& tableName, vector<SelectCondition>& selectConditions, vector<string>& selectAttrs) const {
-    // cout << "tableName: " << tableName << endl;
-    // for ( int i = 0; i < selectConditions.size(); i++ ) {
-    //     cout << selectConditions[i].attributeName << endl;
-    // }
-    // for ( int i = 0; i < selectAttrs.size(); i++ ) {
-    //     cout << "project attribute " << i << ": " << selectAttrs[i] << endl;
-    // }
+    if ( !catalog_manager.is_table_exist(tableName) ) throw MError(SELECT_TABLE_NOT_EXIST);
+    // if the table exists actually, continue the execution
     vector<Tuple> res;
     Table table = catalog_manager.get_table(tableName);
     record_manager.selectTuple(table, selectConditions, res);
@@ -111,23 +106,23 @@ void API::selectTuple(const string& tableName, vector<SelectCondition>& selectCo
 }
 
 void API::insertTuple(const string& tableName, vector<pair<NumType, string>>& tupleString) {
+    if ( !catalog_manager.is_table_exist(tableName) ) throw MError(INSERT_TABLE_NOT_EXIST);
+    // if the table exists actually, continue the execution
     Result res = record_manager.insertTuple(catalog_manager.get_table(tableName), tupleString);
     string primaryKey = catalog_manager.get_primary_key(tableName);
     string indexName = catalog_manager.get_index_name(tableName,primaryKey);
     FieldType type = catalog_manager.getTypeByIndexName(indexName);
     Element element;
     int table_row_num;
-    record_manager.selectlastAttribute(tableName, primaryKey, element, table_row_num);//get attributes
-    // cout << "elements.size() = " << elements.size() << endl;
+    record_manager.selectlastAttribute(tableName, primaryKey, element, table_row_num);  // get attributes
     string data = element.elementToString();
-    int offset = table_row_num-1;//row number =last row
+    int offset = table_row_num-1;   // row number =last row
     index_manager.insert_index(tableName,primaryKey,type,data,offset);
-    // index_manager.show_index(tableName,primaryKey,type);
-    // cout << "create index 6\n";
 }
 
 void API::deleteTuple(const string& tableName, vector<SelectCondition>& selectConditions) {
-    // cout << "API::deleteTuple()" << endl;
+    if ( !catalog_manager.is_table_exist(tableName) ) throw MError(DELETE_TABLE_NOT_EXIST);
+    // if the table exists actually, continue the execution
     Table table = catalog_manager.get_table(tableName);
     cout << record_manager.deleteTuple(table, selectConditions) << " record(s) deleted" << endl;;
 }
