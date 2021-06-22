@@ -130,7 +130,7 @@ Result RecordManager::selectTuple(const Table& table, vector<SelectCondition>& s
     for ( int i = 0; i < conditionNum; i++ ) {
         if ( !(table.attributeVector[selectConditions[i].attributeIndex].isUnique) )
             continue;
-        if ( !catalog_manager.is_index_exist(table.tableName, table.attributeVector[i].attributeName) )
+        if ( !catalog_manager.is_index_exist(table.tableName, table.attributeVector[selectConditions[i].attributeIndex].attributeName) )
             continue;
         isConditionWithIndex[i] = true;
         if ( cntIndex++ == 0 ) {
@@ -194,8 +194,7 @@ int RecordManager::deleteTuple(Table& table, vector<SelectCondition>& selectCond
     for ( int i = 0; i < deleteNum; i++ ) {
         Tuple tuple = searchResult[i];
         if ( tuple.isDeleted() ) {
-            cout << "The tuple is already deleted because tuple.isDeleted." << endl;
-            cout << tuple.getIndex() << endl;
+            cout << "The tuple is already deleted." << endl;
             deleteNum--;
             continue;
         }
@@ -206,8 +205,7 @@ int RecordManager::deleteTuple(Table& table, vector<SelectCondition>& selectCond
         }
         readFromBuffer(table.tableName, tuple.getIndex(), tmpData, table.rowLength);
         if ( tmpData[0] == '0' ) {
-            cout << "The tuple is already deleted because tmpData[0] == '0'." << endl;
-            cout << tuple.getIndex() << endl;
+            cout << "The tuple is already deleted." << endl;
             deleteNum--;
             free(tmpData);
             continue;
@@ -244,11 +242,9 @@ vector<int> RecordManager::selectWithIndex(const Table& table, SelectCondition& 
  * @function: select with condition without index, private member function used for selectTuple()
  **/
 void RecordManager::selectWithoutIndex(string tableName, SelectCondition& condition, vector<Tuple>& tuples) {
-    for(int i = 0; i < tuples.size(); i++) {
-        if(judgeCondition(tableName, tuples[i], condition) == false) {
-            tuples.erase(tuples.begin() + i);
-        }
-    }
+    for(int i = 0; i < tuples.size(); i++)
+        if(judgeCondition(tableName, tuples[i], condition) == false)
+            tuples.erase(tuples.begin() + i--);
 }
 
 /**
