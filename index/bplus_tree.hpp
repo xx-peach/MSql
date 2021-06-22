@@ -375,7 +375,7 @@ void BPlusTree<T>::Union(std::shared_ptr<Node<T>> node){
             if(parent_node->element_num < (order - 1)/2)
                 Union(parent_node);
         }else{//root node
-            if(parent_node->element_num <= 1 ){//not need root
+            if(parent_node->element_num == 0 ){//not need root
                 //can't be node here. maybe return sibling and node has been deleted
                 this->root_index = parent_node->childs_index[0];
                 std::shared_ptr<Node<T>> root_node = NewNodePointer(root_index);
@@ -431,7 +431,7 @@ bool BPlusTree<T>::UnionOrMoveExe(std::shared_ptr<Node<T>> node){
         return false;
     }
     // cout << "union or move node:" <<endl;
-    node->OutputNode();
+    // node->OutputNode();
     block_t parent_index = node->parent_index;
     std::shared_ptr<Node<T>> parent_node = NewNodePointer(parent_index);
     std::shared_ptr<Node<T>> sibling_node;
