@@ -17,9 +17,19 @@ int main(){
     
     time_t begin_t = clock();
     index_manager.create_index(table_name,attribute_name,field_type);
-    for(int i=1; i<test_size; i++){
-        index_manager.find_element(table_name,attribute_name,field_type,(char*)((to_string(i+1000)).c_str()),find_index);
-        index_manager.insert_index(table_name,attribute_name,field_type,to_string(i+1000),(i+1000));
+    for(int i=0; i<test_size; i++){
+        index_manager.find_element(table_name,attribute_name,field_type,(char*)((to_string(i+123)).c_str()),find_index);
+        index_manager.insert_index(table_name,attribute_name,field_type,to_string(i+123),(0));
+    }
+    time_t finish_t = clock();
+    // index_manager.show_index(table_name,attribute_name,field_type);
+    cout << "insert use time = " <<(double )(finish_t - begin_t )/1000 <<endl;
+
+
+    time_t begin_t = clock();
+    for(int i=0; i<test_size; i++){
+        index_manager.find_element(table_name,attribute_name,field_type,(char*)((to_string(i+123)).c_str()),find_index);
+        index_manager.insert_index(table_name,attribute_name,field_type,to_string(i+123),(0));
     }
     time_t finish_t = clock();
     // index_manager.show_index(table_name,attribute_name,field_type);
@@ -27,24 +37,24 @@ int main(){
 
 
 
-     begin_t = clock();
-    for(int i=test_size*5/6+1; i<test_size; i++){
-        index_manager.delete_index(table_name,attribute_name,field_type,to_string(i+1000));
-    }
-     finish_t = clock();
-    cout << "delete use time = " <<(double )(finish_t - begin_t )/1000 <<endl;
+    //  begin_t = clock();
+    // for(int i=test_size*5/6+1; i<test_size; i++){
+    //     index_manager.delete_index(table_name,attribute_name,field_type,to_string(i+1000));
+    // }
+    //  finish_t = clock();
+    // cout << "delete use time = " <<(double )(finish_t - begin_t )/1000 <<endl;
+    // // index_manager.show_index(table_name,attribute_name,field_type);
+
+
+
+
+    //  begin_t = clock();
+    // for(int i=0; i<test_size*5/6; i++){
+    //     index_manager.delete_index(table_name,attribute_name,field_type,to_string(i+1000));
+    // }
+    //  finish_t = clock();
+    // cout << "delete use time = " <<(double )(finish_t - begin_t )/1000 <<endl;
     // index_manager.show_index(table_name,attribute_name,field_type);
-
-
-
-
-     begin_t = clock();
-    for(int i=1; i<test_size*5/6; i++){
-        index_manager.delete_index(table_name,attribute_name,field_type,to_string(i+1000));
-    }
-     finish_t = clock();
-    cout << "delete use time = " <<(double )(finish_t - begin_t )/1000 <<endl;
-    index_manager.show_index(table_name,attribute_name,field_type);
     // for(int i=850; i<883; i++){
     //     index_manager.delete_index(table_name,attribute_name,field_type,to_string(i+1000));
     //     index_manager.show_index(table_name,attribute_name,field_type);
@@ -52,7 +62,7 @@ int main(){
     
     // const string data = "1";
     // index_manager.create_index(table_name,attribute_name,field_type);
-    // for(int i=1; i<=100; i++){
+    // for(int i=0; i<=100; i++){
     //     index_manager.insert_index(table_name,attribute_name,field_type,to_string(i),(i+10));
     // }
     // index_manager.show_index(table_name,attribute_name,field_type);

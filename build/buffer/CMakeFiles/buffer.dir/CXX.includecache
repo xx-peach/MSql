@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/c/Users/think/minisql_proj/new/MSql-index/MSql/buffer/buffer.cpp
+./buffer.hpp
+/mnt/c/Users/think/minisql_proj/new/MSql-index/MSql/buffer/buffer.hpp
+iostream
+-
+fstream
+-
+string
+-
+cstring
+-
+
+/mnt/c/Users/think/minisql_proj/new/MSql-index/MSql/buffer/buffer.hpp
+list
+-
+string
+-
+../config.hpp
+/mnt/c/Users/think/minisql_proj/new/MSql-index/MSql/config.hpp
+
+/mnt/c/Users/think/minisql_proj/new/MSql-index/MSql/config.hpp
+cstddef
+-
+

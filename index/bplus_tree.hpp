@@ -608,11 +608,12 @@ void BPlusTree<T>::GreaterThan(T value, std::vector<block_t> &block_offset){
 //return the block offset that less than value
 template <class T>
 void BPlusTree<T>::LessThan(T value, std::vector<block_t> &block_offset){
+    // cout << "into less than" << endl;
     std::shared_ptr<Node<T>> res_node;
     int res_index = -1;
     std::shared_ptr<Node<T>> root_node = NewNodePointer(this->root_index);
     SearchInNodeExe(root_node,value,res_node,res_index);
-    int index = (res_index < 0) ? -(res_index+1) : res_index;//toward nearest less
+    int index = (res_index < 0) ? -(res_index+1) : res_index-1;//toward nearest less
     
     block_t corruent_index = this->first_leaf_index;
     std::shared_ptr<Node<T>> corruent_node;
@@ -624,8 +625,8 @@ void BPlusTree<T>::LessThan(T value, std::vector<block_t> &block_offset){
         corruent_index = corruent_node->next_leaf_index;
     }
     if(corruent_index != -1){
-        for(int i = 0; i < index; i++){
-            block_offset.push_back(corruent_node->offset[i]);//store offset
+        for(int i = 0; i <= index; i++){
+            block_offset.push_back(res_node->offset[i]);//store offset
         }
     }
 }

@@ -141,7 +141,7 @@ Result IndexManager::find_element(const string &table_name, const string &attrib
     string map_index = table_name+"/"+attribute_name;
     Result flag = SUCCESS;
     block_t find_index;
-    block_index.clear();//initial result
+    // block_index.clear();//initial result
     if(is_index_exist(map_index,type)){//exist
         switch(type.get_type()){
             case CHAR:{
@@ -173,7 +173,7 @@ Result IndexManager::greater_than(const string &table_name, const string &attrib
     string map_index = table_name+"/"+attribute_name;
     Result flag = SUCCESS;
     block_t find_index;
-    block_index.clear();//initial result
+    // block_index.clear();//initial result
 
     if(!is_index_exist(map_index,type)){//not exist
         flag = NO_INDEX;
@@ -196,17 +196,19 @@ Result IndexManager::less_than(const string &table_name, const string &attribute
     string map_index = table_name+"/"+attribute_name;
     Result flag = SUCCESS;
     block_t find_index;
-    block_index.clear();//initial result
+    // block_index.clear();//initial result
 
     if(!is_index_exist(map_index,type)){//not exist
         flag = NO_INDEX;
     }else{//exist
+        // cout << "into less here" << endl;
         switch(type.get_type()){//always do
-            case INT:   {   int_index[map_index]->LessThan(atoi(value),block_index);    break;}
-            case FLOAT: {   float_index[map_index]->LessThan(atof(value),block_index);  break;}
-            case CHAR:  {   string_index[map_index]->LessThan(value,block_index);       break;}
+            case INT:   {   int_index[map_index]->LessThan(atoi(value),block_index);    goto here;}
+            case FLOAT: {   float_index[map_index]->LessThan(atof(value),block_index);  goto here;}
+            case CHAR:  {   string_index[map_index]->LessThan(value,block_index);       goto here;}
             default: {return WRONG_TYPE;}
         }
+        here:
         if(is_equal){//is eqaul -> maybe 1 more value
             find_element(table_name,attribute_name,type,value,block_index);
         }
@@ -225,6 +227,7 @@ Result IndexManager::less_than(const string &table_name, const string &attribute
     ERROR_CMP*/
 Result IndexManager::compare(const string &table_name, const string &attribute_name, FieldType type, char* value, std::vector<block_t> &block_index, CMP cmp){
     Result flag1 = SUCCESS, flag2 = SUCCESS;
+    // cout << "cmp = " << cmp << endl;
     switch(cmp){
         case EQUAL:{
             return (find_element(table_name,attribute_name,type,value,block_index));
