@@ -127,12 +127,7 @@ private:
 	Result storeTable() {
 		ofstream file;
 		file.open(tableFileName, ios::out | ios::trunc);
-		if ( !file.is_open() ) {
-			throw MError(TABLE_CATALOG_FILE_WRITE_ERROR);
-			// cout << "CatalogManager::storeTable error, open file " << tableFileName << " fail" << endl;
-			// // file.close();
-			// return TABLE_CATALOG_FILE_WRITE_ERROR;
-		}
+		if ( !file.is_open() ) throw MError(TABLE_CATALOG_FILE_WRITE_ERROR);
 		else {
 			Table tmpTable;
 			for ( auto it : tables ) {
@@ -177,12 +172,7 @@ private:
 	Result storeIndex() {
 		ofstream file;
 		file.open(indexFileName, ios::out | ios::trunc);
-		if ( !file.is_open() ) {
-			throw MError(INDEX_CATALOG_FILE_WRITE_ERROR);
-			// cout << "CatalogManager::storeIndex, open file " << indexFileName << " fail" << endl;
-			// file.close();
-			// return INDEX_CATALOG_FILE_WRITE_ERROR;
-		}
+		if ( !file.is_open() ) throw MError(INDEX_CATALOG_FILE_WRITE_ERROR);
 		else {
 			Index tmpIndex;
 			for ( auto it : indexes ) {
@@ -242,26 +232,19 @@ public:
 	Result createTable(Table newTable) {
 		if(is_table_exist(newTable.tableName))
 			throw MError(TABLE_NAME_EXSITED);
-			// return TABLE_NAME_EXSITED;
 		tables.insert(make_pair(newTable.tableName, newTable));
+		
 		ofstream file;
 		string tableFileName = TABLE_DIR + newTable.tableName + TABLE_SUF;
 		file.open(tableFileName, ios::out | ios::trunc);
-		if ( !file.is_open() ) {
+		if ( !file.is_open() ) 
 			throw MError(TABLE_CATALOG_FILE_WRITE_ERROR);
-			// cout << "CatalogManager::createTable error, open file " << tableFileName << " fail" << endl;
-			// file.close();
-			// return TABLE_CATALOG_FILE_WRITE_ERROR;
-		}
 		file.close();
+
 		tableFileName = INDEX_DIR + newTable.tableName + INDEX_SUF;
 		file.open(tableFileName, ios::out | ios::trunc);
-		if ( !file.is_open() ) {
+		if ( !file.is_open() ) 
 			throw MError(TABLE_CATALOG_FILE_WRITE_ERROR);
-			// cout << "CatalogManager::createTable error, open file " << tableFileName << " fail" << endl;
-			// file.close();
-			// return TABLE_CATALOG_FILE_WRITE_ERROR;
-		}
 		file.close();
 		string indexName = newTable.tableName + "_" + newTable.primaryKey;
 		createIndex(indexName, newTable.tableName, newTable.primaryKey);
@@ -274,7 +257,6 @@ public:
 	Result dropTable(string tableName) {
 		if ( !is_table_exist(tableName) )
 			throw MError(TABLE_NAME_NOEXSIT);
-			// return TABLE_NAME_NOEXSIT;
 
 		Table& tmpTable = tables[tableName];
 		fiter tableFile = buffer_manager.getFile(tableName, 0, tmpTable.rowLength, tmpTable.rowNum);
@@ -306,16 +288,12 @@ public:
 	Result createIndex(Index newIndex) {
 		if(is_index_exist(newIndex.indexName))
 			throw MError(INDEX_NAME_EXSITED);
-			// return INDEX_NAME_EXSITED;
 		if(!is_table_exist(newIndex.tableName))
 			throw MError(TABLE_NAME_NOEXSIT);
-			// return TABLE_NAME_NOEXSIT;
 		if(!is_attribute_exist(newIndex.tableName, newIndex.attributeName))
 			throw MError(ATTRI_NAME_NOEXSIT);
-			// return ATTRI_NAME_NOEXSIT;
 		if(!is_unique(newIndex.tableName, newIndex.attributeName))
 			throw MError(ATTRI_NOT_UNIQUE);
-			// return ATTRI_NOT_UNIQUE;
 
 		Table& tmpTable = tables[newIndex.tableName];
 		tmpTable.indexVector.push_back(newIndex);
@@ -331,17 +309,15 @@ public:
 	Result dropIndex(string indexName) {
 		if ( !is_index_exist(indexName) )
 			throw MError(INDEX_NAME_NOEXIST);
-			// return INDEX_NAME_NOEXIST;
 
 		Index tmpIndex = get_index(indexName);
 		if ( !is_table_exist(tmpIndex.tableName) )
 			throw MError(TABLE_NAME_NOEXSIT);
-			// return TABLE_NAME_NOEXSIT;
 
 		Table& tmpTable = tables[tmpIndex.tableName];
 		if ( !tmpTable.removeIndex(indexName) )
 			throw MError(INDEX_NAME_NOEXIST);
-			// return INDEX_NAME_NOEXIST;
+
 		tmpTable.indexNum = tmpTable.indexVector.size();
 		indexes.erase(indexName);
 		table_attrToIndex.erase(tmpIndex.tableName + " " + tmpIndex.attributeName);
@@ -376,22 +352,18 @@ public:
 			Table tmpTable = tables[tableName];
 			return tmpTable.primaryKey == attributeName;
 		}
-		else {
-			// cout << "The table " << tableName << " doesn't exist" << endl;
-			return false;
-		}
+		else return false;
 	}
 
 	bool is_unique(string tableName, string attributeName) {
 		if(tables.find(tableName) != tables.end()) {
 			Table tmpTable = tables[tableName];
-			for(auto it : tmpTable.attributeVector)
+			for(auto it : tmpTable.attributeVector) {
 				if(it.attributeName == attributeName)
 					return it.isUnique;
-			// cout << "The attribute " << attributeName << " doesn't exist" << endl;
+			}
 			return false;
 		}
-		// cout << "The table " << tableName << " doesn't exist" << endl;
 		return false;
 	}
 
@@ -418,13 +390,11 @@ public:
 	bool is_attribute_exist(string tableName, string attributeName) {
 		if(tables.find(tableName) != tables.end()) {
 			Table tmpTable = tables[tableName];
-			for(auto it : tmpTable.attributeVector)
+			for(auto it : tmpTable.attributeVector) {
 				if(it.attributeName == attributeName)
 					return true;
-			// cout << "The attribute " << attributeName << " doesn't exist" << endl;
+			}
 		}
-		// else
-			// cout << "The table " << tableName << " doesn't exist" << endl;
 		return false;
 	}
 
@@ -499,10 +469,10 @@ public:
 
 	int get_attribute_index(string tableName, string attributeName) {
 		Table tmpTable = tables[tableName];
-		for(int i = 0; i < tmpTable.attributeVector.size(); i++)
+		for(int i = 0; i < tmpTable.attributeVector.size(); i++) {
 			if (tmpTable.attributeVector.at(i).attributeName == attributeName)
 				return i;
-		// cout << "The attribute " << attributeName << " doesn't exist" << endl;
+		}
 		return -1;
 	}
 
@@ -514,7 +484,6 @@ public:
 			if (tmpAttribute.attributeName == attributeName)
 				return tmpAttribute.type;
 		}
-		// cout << "The attribute " << attributeName << " doesn't exist" << endl;
 		return FieldType();
 	}
 
@@ -528,7 +497,6 @@ public:
 		for(auto it : tmpTable.attributeVector)
 			if(it.attributeName == attributeName)
 				return it.type.get_length();
-		// cout << "The attribute " << attributeName << " doesn't exist" << endl;
 		return -1;
 	}
 
@@ -551,7 +519,7 @@ public:
 	}
 
 	int get_max_attr_length(Table table) {
-		int len = 9; // The size of "ATTRIBUTE"
+		int len = 9; 		// The size of "ATTRIBUTE"
 		for(auto it : table.attributeVector) {
 			int v = it.attributeName.length();
 			len = v > len ? v : len;
@@ -559,6 +527,7 @@ public:
 		return len;
 	}
 
+	// for debug use
 	void show_table() {
 		Table tmpTable;
 		Attribute tmpAttribute;
@@ -574,9 +543,10 @@ public:
 		}
 	}
 	
+	// for debug use
 	void show_index() {
 		Index tmpIndex;
-		int idx = 5, tab = 5, attr = 9; // "INDEX", "TABLE", "ATTRIBUTE"
+		int idx = 5, tab = 5, attr = 9; 	// "INDEX", "TABLE", "ATTRIBUTE"
 		cout << "There are " << indexes.size() << " index(es) in total:" << endl;
 		for(auto it : indexes) {
 			tmpIndex = it.second;
@@ -590,6 +560,7 @@ public:
 		}
 	}
 
+	// for debug use
 	void show_catalog() {
 		show_table();
 		cout << endl;

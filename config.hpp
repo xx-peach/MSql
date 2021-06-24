@@ -68,6 +68,7 @@ enum Result {
     SELECT_TABLE_NOT_EXIST = -42,
     INSERT_TABLE_NOT_EXIST = -43,
     DELETE_TABLE_NOT_EXIST = -44,
+    API_CREATE_INDEX_ERROR = -45,
 
     // Record
     NO_SUCH_TABLE = -61,

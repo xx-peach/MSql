@@ -98,6 +98,9 @@ public:
         else if ( m_badValue == BUFFER_OVERFLOW ) {
             cout << "BufferManager::Block::write error, block overflow" << endl;
         }
+        else if ( m_badValue == API_CREATE_INDEX_ERROR ) {
+            cout << "API::createIndex error, index create fail" << endl;
+        }
     }
 };
 
